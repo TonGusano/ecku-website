@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ecku-website",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["static-server.js"],
+      "port": 3002
+    }
+  ]
+}

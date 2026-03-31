@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Header Concept – ECKU</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #1a6b3a; }
+
+  /* ── CONCEPT HEADER ── */
+  .header-concept {
+    width: 100%;
+    background: linear-gradient(135deg, #0a2e14 0%, #1a5c2e 50%, #0f3d1e 100%);
+    padding: 28px 48px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 4px solid #e8f040;
+  }
+
+  /* subtiele achtergrond-decoratie */
+  .header-concept::before {
+    content: '';
+    position: absolute;
+    right: -80px; top: -80px;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(46,170,95,0.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-concept::after {
+    content: '';
+    position: absolute;
+    left: 30%; top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(232,240,64,0.2), transparent);
+  }
+
+  /* Logo */
+  .header-logo {
+    flex-shrink: 0;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 0 3px rgba(232,240,64,0.4);
+    z-index: 1;
+  }
+
+  /* Tekst-blok */
+  .header-text {
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .header-tag {
+    display: inline-block;
+    background: rgba(232,240,64,0.15);
+    border: 1px solid rgba(232,240,64,0.4);
+    color: #e8f040;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    width: fit-content;
+  }
+
+  .header-title {
+    color: #ffffff;
+    font-size: clamp(22px, 3.5vw, 42px);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+  }
+
+  .header-title em {
+    color: #e8f040;
+    font-style: normal;
+  }
+
+  .header-sub {
+    color: rgba(255,255,255,0.7);
+    font-size: clamp(13px, 1.5vw, 17px);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+
+  /* ── NAV BAR ── */
+  .nav-bar {
+    background: #0f3d1e;
+    border-bottom: 1px solid rgba(232,240,64,0.2);
+    padding: 0 48px;
+  }
+  .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .nav-links a {
+    display: block;
+    padding: 14px 16px;
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: #e8f040; }
+  .nav-links .active a { color: #e8f040; border-bottom: 2px solid #e8f040; }
+
+  /* ── DEMO CONTENT ── */
+  .demo-body {
+    padding: 60px 48px;
+    color: rgba(255,255,255,0.6);
+    font-size: 15px;
+    text-align: center;
+  }
+  .demo-body p { max-width: 500px; margin: 0 auto; }
+
+  /* Label */
+  .concept-label {
+    background: rgba(232,240,64,0.9);
+    color: #0f3d1e;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 6px 16px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="concept-label">⬇ CONCEPT — Nieuwe header</div>
+
+<header>
+  <div class="header-concept">
+    <img src="images/ECKU-logo.png" alt="ECKU logo" class="header-logo">
+    <div class="header-text">
+      <span class="header-tag">Energiecoöperatie De Kwakel &amp; Uithoorn</span>
+      <h1 class="header-title">
+        ECKU helpt jou en jouw buurt<br>
+        op weg naar een <em>duurzame toekomst</em>
+      </h1>
+      <p class="header-sub">Voor en door bewoners · lokaal, eerlijk en fossielvrij</p>
+    </div>
+  </div>
+
+  <nav class="nav-bar">
+    <ul class="nav-links">
+      <li class="active"><a href="#">Home</a></li>
+      <li><a href="#">Actueel</a></li>
+      <li><a href="#">Energie besparen</a></li>
+      <li><a href="#">Subsidies</a></li>
+      <li><a href="#">Bespaarwidget</a></li>
+      <li><a href="#">Projecten</a></li>
+      <li><a href="#">AI Adviseur</a></li>
+      <li><a href="#">Podcast</a></li>
+      <li><a href="#">Over ons</a></li>
+      <li><a href="#">Nieuwsbrief</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<div class="demo-body">
+  <p>↑ Zo zou de nieuwe header eruitzien — scroltbare website-inhoud begint hier</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,2778 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECKU – Energie Coöperatie De Kwakel & Uithoorn</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    /* ── Reset ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; overflow-x: hidden; }
+    body { font-family: 'Inter', sans-serif; color: #1a2e1a; background: linear-gradient(140deg, #0f3d1e 0%, #1a6b3a 55%, #2eaa5f 100%) fixed; line-height: 1.65; overflow-x: hidden; max-width: 100vw; }
+    img  { max-width: 100%; display: block; }
+    a    { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font-family: inherit; }
+
+    /* ── Tokens ─────────────────────────────────────────── */
+    :root {
+      --g-dark:   #0c3d22;
+      --g-mid:    #1a6b3a;
+      --g-light:  #2eaa5f;
+      --g-pale:   #eaf4ee;
+      --yellow:   #e8f045;
+      --yellow-w: #f5c832;
+      --cream:    #f6f9f2;
+      --white:    #ffffff;
+      --text:     #1a2e1a;
+      --muted:    #4d6b50;
+      --border:   #d3e6d5;
+      --radius:   16px;
+      --shadow:   0 4px 28px rgba(12,61,34,.10);
+      --shadow-lg:0 12px 48px rgba(12,61,34,.16);
+    }
+
+    /* ── Layout helpers ─────────────────────────────────── */
+    .container   { max-width: 1160px; margin: 0 auto; padding: 0 28px; }
+    .section     { padding: 100px 0; }
+    .section-sm  { padding: 64px 0; }
+    .bg-cream    { background: transparent; }
+    .bg-dark     { background: var(--g-dark); color: var(--white); }
+    .bg-mid      { background: var(--g-mid);  color: var(--white); }
+    .text-center { text-align: center; }
+
+    /* ── Tekst wit op gradient achtergrond ───────────────── */
+    .section h1, .section h2, .section h3, .section h4,
+    .section p, .section .lead, .section .eyebrow,
+    .section label, .section .muted, .section span:not(.badge):not(.tag):not(.project-tag):not(.ep-new):not(.agenda-tag-badge) {
+      color: #fff;
+    }
+    .section .lead { color: rgba(255,255,255,.85); }
+    .section .eyebrow { color: var(--yellow); }
+
+    /* ── Tekst donker houden binnen witte kaartjes ───────── */
+    .tip-item, .tip-item *, .project-card .project-body, .project-card .project-body *,
+    .board-card, .board-card *, .quote-card, .quote-card *,
+    .nl-form-wrap, .nl-form-wrap *, .contact-form-card, .contact-form-card *,
+    .agenda-card .agenda-info, .agenda-card .agenda-info *,
+    .ep-info, .ep-info *,
+    .pod-card, .pod-card *, .plat-btn, .plat-btn * {
+      color: var(--text) !important;
+    }
+    .tip-item p, .project-card .project-body p, .board-card p,
+    .agenda-card .agenda-info p, .ep-info .ep-dur, .ep-info .ep-num {
+      color: var(--muted) !important;
+    }
+
+    /* ── Typography ─────────────────────────────────────── */
+    .eyebrow {
+      display: inline-block;
+      font-size: 11px; font-weight: 700; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--g-mid);
+      background: var(--yellow); border-radius: 100px;
+      padding: 5px 14px; margin-bottom: 18px;
+    }
+    .bg-dark .eyebrow, .bg-mid .eyebrow { color: var(--g-dark); }
+    h1,h2,h3,h4 { line-height: 1.12; }
+    h2 { font-size: clamp(28px, 4vw, 46px); font-weight: 800; margin-bottom: 18px; }
+    h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
+    .lead { font-size: 18px; color: var(--muted); max-width: 620px; margin-bottom: 48px; }
+    .bg-dark .lead, .bg-mid .lead { color: rgba(255,255,255,.72); }
+
+    /* ── Buttons ─────────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 30px; border-radius: 50px; border: 2px solid transparent;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      transition: transform .18s, box-shadow .18s, background .18s, color .18s;
+      white-space: nowrap;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+    .btn-yellow { background: var(--yellow); color: var(--white); }
+    .btn-yellow:hover { background: #d9e032; }
+    .btn-green  { background: var(--g-mid); color: var(--white); }
+    .btn-green:hover  { background: var(--g-light); }
+    .btn-outline-w { background: transparent; border-color: rgba(255,255,255,.55); color: var(--white); }
+    .btn-outline-w:hover { background: rgba(255,255,255,.12); }
+    .btn-outline-g { background: transparent; border-color: var(--g-mid); color: var(--g-mid); }
+    .btn-outline-g:hover { background: var(--g-pale); }
+    .btn-sm { padding: 10px 22px; font-size: 14px; }
+
+    /* ── Photo placeholder ──────────────────────────────── */
+    .photo-box {
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--g-pale);
+      border: 2px dashed var(--border);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 10px; color: var(--muted);
+      font-size: 14px; font-weight: 500;
+      text-align: center; padding: 24px;
+    }
+    .photo-box .photo-icon { font-size: 40px; opacity: .5; }
+    .photo-box img { width: 100%; height: 100%; object-fit: cover; border-radius: calc(var(--radius) - 2px); }
+    /* Als er een foto in zit: padding weg en geen streepjesrand */
+    .photo-box:has(img) { padding: 0; border: none; gap: 0; }
+
+    /* ══════════════════════════════════════════════════════
+       HEADER — afbeelding + nav
+    ══════════════════════════════════════════════════════ */
+    #site-header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    }
+
+    /* Donkergroene wrapper: rand boven én onder de afbeelding */
+    .header-bg {
+      background: var(--g-dark);
+      width: 100%;
+      padding-top: 16px;    /* groene rand boven */
+      padding-bottom: 14px; /* groene ruimte onder afbeelding, voor menu */
+    }
+    .header-banner {
+      display: block;
+      line-height: 0;
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 28px;
+      box-sizing: border-box;
+    }
+    .header-banner-img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Nav bar: zelfde kleur als header-bg, geen lijnen */
+    .nav-bar {
+      background: var(--g-dark);
+    }
+
+    /* Mobiel: volle breedte, geen zijpadding */
+    @media (max-width: 768px) {
+      .header-banner {
+        max-width: 100%;
+        padding: 0;
+      }
+    }
+
+    /* ── Nav bar ── */
+    .nav-wrap {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 52px;
+    }
+    .nav-links {
+      display: flex; align-items: center;
+      list-style: none; justify-content: center;
+      flex: 1; flex-wrap: nowrap; gap: 0;
+    }
+    .nav-links a {
+      color: rgba(255,255,255,.88); font-size: 15px; font-weight: 500;
+      padding: 8px 12px; border-radius: 6px;
+      transition: color .18s, background .18s;
+      white-space: nowrap;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--yellow); background: rgba(232,240,69,.09);
+    }
+    .nav-right { display: flex; align-items: center; }
+    .nav-cta { display: none; }
+
+    .nav-burger {
+      display: none; flex-direction: column; gap: 5px;
+      cursor: pointer; padding: 6px;
+    }
+    .nav-burger span { display: block; width: 22px; height: 2px; background: #fff; border-radius: 2px; }
+
+    /* Mobile menu — top = banner(160) + stripe(8) + nav(48) */
+    .mobile-menu {
+      display: none; position: fixed; top: 216px; left: 0; right: 0; z-index: 199;
+      background: var(--g-dark); padding: 20px 28px 28px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .mobile-menu.open { display: flex; flex-direction: column; gap: 4px; }
+    .mobile-menu a {
+      color: rgba(255,255,255,.8); font-size: 16px; font-weight: 500;
+      padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .mobile-menu a:hover { color: var(--yellow); }
+    .mobile-menu .mob-cta {
+      margin-top: 16px; background: var(--yellow); color: var(--g-dark);
+      text-align: center; padding: 14px; border-radius: 50px; font-weight: 800;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       PODCAST sectie — twee aparte kaarten (NL + EN)
+    ══════════════════════════════════════════════════════ */
+    .podcast-intro {
+      text-align: left; margin: 0 0 40px 0;
+    }
+    .podcast-cards {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 780px; margin: 0 auto;
+    }
+
+    /* Kaart */
+    .pod-card {
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      transition: transform .22s, box-shadow .22s;
+      display: flex; flex-direction: column;
+    }
+    .pod-card:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(0,0,0,.13); }
+
+    /* Poster-cover — iets compacter formaat */
+    .pod-poster {
+      position: relative;
+      aspect-ratio: 9/10;
+      overflow: hidden;
+      background: linear-gradient(160deg, #7cdc2a 0%, #e8f045 40%, #f0b429 100%);
+    }
+    /* Echte afbeelding als die er is */
+    .pod-poster img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: top;
+      display: block;
+    }
+    /* CSS-fallback poster (zichtbaar als geen img) */
+    .pod-poster-fallback {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-start;
+      padding: 28px 20px 20px;
+      background: linear-gradient(160deg, #7cdc2a 0%, #e8f045 38%, #e8c12a 70%, #d4831a 100%);
+    }
+    .pod-poster img ~ .pod-poster-fallback { display: none; } /* verberg fallback als img laadt */
+    .pod-flag {
+      position: absolute; top: 14px; right: 14px;
+      font-size: 32px; filter: drop-shadow(0 2px 4px rgba(0,0,0,.3));
+    }
+    .pod-mic {
+      font-size: 52px; margin-bottom: 4px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,.3));
+    }
+    .pod-label-podcast {
+      font-size: 32px; font-weight: 900; color: #6B21D6;
+      line-height: 1; letter-spacing: -1px;
+      text-shadow: 2px 2px 0 rgba(0,0,0,.15);
+    }
+    .pod-label-talkshow {
+      font-size: 18px; font-weight: 900; color: #1a2f6b;
+      letter-spacing: 3px; margin-bottom: 6px;
+    }
+    .pod-episode-banner {
+      background: #c41c1c; color: #fff;
+      padding: 5px 18px; border-radius: 4px;
+      font-size: 14px; font-weight: 800; letter-spacing: 1px;
+      margin-bottom: 12px;
+      clip-path: polygon(4% 0%, 96% 0%, 100% 50%, 96% 100%, 4% 100%, 0% 50%);
+    }
+    .pod-ecku-text {
+      font-size: 64px; font-weight: 900; color: var(--g-mid);
+      line-height: 1; letter-spacing: -3px;
+      text-shadow: 3px 3px 0 rgba(0,0,0,.12);
+    }
+    .pod-tagline {
+      font-size: 13px; font-weight: 700; color: #1a2f1a;
+      text-align: center; margin: 8px 0 16px;
+      padding: 0 12px;
+    }
+    /* Presentatoren */
+    .pod-hosts {
+      display: flex; gap: 14px; justify-content: center;
+      margin-top: auto;
+    }
+    .pod-host {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    .pod-host-avatar {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: rgba(0,0,0,.35);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; border: 3px solid rgba(255,255,255,.5);
+      overflow: hidden;
+    }
+    .pod-host-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .pod-host-name {
+      background: #4caf50; color: #fff;
+      font-size: 12px; font-weight: 700;
+      padding: 3px 14px; border-radius: 50px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.2);
+    }
+    .pod-footer-bar {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(80,40,0,.75); color: #fff;
+      font-size: 12px; font-weight: 700;
+      text-align: center; padding: 7px 12px;
+      letter-spacing: .04em;
+    }
+
+    /* Info-blok onder de poster */
+    .pod-info {
+      padding: 24px 26px 28px;
+      display: flex; flex-direction: column; gap: 14px;
+      flex: 1;
+    }
+    .pod-lang-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--g-mid);
+      background: var(--g-pale); border-radius: 50px;
+      padding: 4px 12px; width: fit-content;
+    }
+    .pod-title { font-size: 20px; font-weight: 800; color: var(--g-dark); line-height: 1.2; }
+    .pod-desc  { font-size: 14px; color: var(--muted); line-height: 1.6; }
+    .pod-ep-row {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--g-pale); border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .pod-ep-play {
+      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+      background: var(--g-mid); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; transition: background .18s;
+    }
+    .pod-ep-row:hover .pod-ep-play { background: var(--g-dark); }
+    .pod-ep-meta { flex: 1; }
+    .pod-ep-num  { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+    .pod-ep-name { font-size: 14px; font-weight: 700; color: var(--g-dark); margin: 1px 0 2px; }
+    .pod-ep-dur  { font-size: 11px; color: var(--muted); }
+    .pod-new-badge {
+      font-size: 10px; font-weight: 800; letter-spacing: .08em;
+      text-transform: uppercase; background: var(--yellow);
+      color: var(--g-dark); border-radius: 50px; padding: 3px 10px; flex-shrink: 0;
+    }
+    .pod-btn {
+      display: block; text-align: center;
+      background: var(--g-mid); color: #fff;
+      border-radius: 50px; padding: 13px 20px;
+      font-size: 14px; font-weight: 800;
+      transition: background .18s, transform .18s;
+      margin-top: auto;
+    }
+    .pod-btn:hover { background: var(--g-dark); transform: translateY(-2px); color: #fff; }
+
+    @media (max-width: 768px) {
+      .podcast-cards { grid-template-columns: 1fr; }
+    }
+
+    /* ══════════════════════════════════════════════════════
+       HERO
+    ══════════════════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(140deg, var(--g-dark) 0%, #1a6b3a 55%, #2eaa5f 100%);
+      display: flex; align-items: center;
+      padding-top: calc(min(26vw, 340px) + 60px); /* max 340px = container-breedte proportioneel */
+      position: relative; overflow: hidden;
+    }
+    .hero-bg-pattern {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        radial-gradient(circle at 20% 80%, rgba(232,240,69,.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,.04) 0%, transparent 50%);
+    }
+    .hero-inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: center;
+      position: relative; z-index: 1;
+      padding: 80px 0;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(232,240,69,.12); border: 1px solid rgba(232,240,69,.28);
+      border-radius: 100px; padding: 7px 18px;
+      color: var(--yellow); font-size: 13px; font-weight: 600;
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 5.5vw, 68px); font-weight: 900;
+      color: var(--white); margin-bottom: 22px;
+    }
+    .hero h1 em { font-style: normal; color: var(--yellow); }
+    .hero-sub { font-size: 19px; color: rgba(255,255,255,.78); margin-bottom: 38px; max-width: 500px; }
+    .hero-btns { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 52px; }
+    .hero-stats { display: flex; gap: 36px; flex-wrap: wrap; }
+    .stat-num { font-size: 30px; font-weight: 900; color: var(--yellow); line-height: 1; }
+    .stat-lbl { font-size: 12px; color: rgba(255,255,255,.6); margin-top: 4px; }
+
+    /* Hero photo area */
+    .hero-photo {
+      position: relative;
+    }
+    .hero-photo-main {
+      width: 100%; aspect-ratio: 4/3;
+      border-radius: 24px;
+      overflow: hidden;
+      background: rgba(255,255,255,.08);
+      border: 2px dashed rgba(255,255,255,.25);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 12px; color: rgba(255,255,255,.5);
+      font-size: 14px; text-align: center; padding: 24px;
+    }
+    .hero-photo-main .pi { font-size: 52px; opacity: .4; }
+    .hero-photo-badge {
+      position: absolute; bottom: -16px; left: -16px;
+      background: var(--yellow); color: var(--g-dark);
+      border-radius: 14px; padding: 16px 22px;
+      font-weight: 800; font-size: 14px; line-height: 1.3;
+      box-shadow: var(--shadow);
+    }
+    .hero-photo-badge span { display: block; font-size: 11px; font-weight: 500; opacity: .7; }
+
+    /* ══════════════════════════════════════════════════════
+       PILLARS (Wat is ECKU)
+    ══════════════════════════════════════════════════════ */
+    .pillars-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 24px; margin-top: 56px;
+    }
+    .pillar {
+      background: var(--white); border-radius: var(--radius);
+      padding: 36px 32px; box-shadow: var(--shadow);
+      border-top: 4px solid var(--yellow);
+      transition: transform .22s, box-shadow .22s;
+    }
+    .pillar:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+    .pillar-icon { font-size: 44px; margin-bottom: 18px; }
+    .pillar p { font-size: 15px; color: var(--muted); }
+
+    /* ══════════════════════════════════════════════════════
+       ENERGIE BESPAREN
+    ══════════════════════════════════════════════════════ */
+    .energie-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: stretch; margin-top: 56px;
+    }
+    .tips-list { display: flex; flex-direction: column; gap: 16px; margin-top: 32px; }
+    .tip-item {
+      display: flex; gap: 16px; align-items: flex-start;
+      background: var(--white); border-radius: 14px;
+      padding: 20px 22px; box-shadow: var(--shadow);
+      transition: transform .18s;
+    }
+    .tip-item:hover { transform: translateX(4px); }
+    .tip-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--yellow); color: var(--g-dark);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .tip-body h4 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .tip-body p  { font-size: 14px; color: var(--muted); }
+
+    /* Coach card */
+    .coach-card {
+      background: var(--g-dark); color: var(--white);
+      border-radius: var(--radius); padding: 40px;
+      margin-top: 32px;
+    }
+    .coach-card h3 { color: var(--yellow); margin-bottom: 12px; }
+    .coach-card p  { font-size: 15px; opacity: .8; margin-bottom: 24px; }
+
+    /* ══════════════════════════════════════════════════════
+       PROJECTEN
+    ══════════════════════════════════════════════════════ */
+    .projects-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 24px; margin-top: 56px;
+    }
+    .project-card {
+      background: var(--white); border-radius: var(--radius);
+      overflow: hidden; box-shadow: var(--shadow);
+      transition: transform .22s, box-shadow .22s;
+    }
+    .project-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+    .project-img {
+      width: 100%; aspect-ratio: 16/9;
+      background: var(--g-pale);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 52px; border-bottom: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .project-img-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--g-dark), var(--g-mid));
+      opacity: .82;
+    }
+    .project-img-emoji { position: relative; z-index: 1; }
+    .project-body { padding: 26px; }
+    .project-tag {
+      font-size: 11px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--g-mid);
+      background: var(--g-pale); border-radius: 100px;
+      padding: 3px 10px; display: inline-block; margin-bottom: 10px;
+    }
+    .project-body p  { font-size: 14px; color: var(--muted); margin-bottom: 18px; }
+    .project-meta {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 600; color: var(--g-mid);
+    }
+
+    /* ══════════════════════════════════════════════════════
+       LID WORDEN
+    ══════════════════════════════════════════════════════ */
+    .lid-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: start; margin-top: 56px;
+    }
+    .membership-card {
+      background: var(--white); border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+    .membership-header {
+      background: var(--g-dark); color: var(--white);
+      padding: 32px; text-align: center;
+    }
+    .membership-price {
+      font-size: 56px; font-weight: 900; color: var(--yellow);
+      line-height: 1;
+    }
+    .membership-price sub { font-size: 20px; vertical-align: super; }
+    .membership-period { font-size: 14px; opacity: .7; }
+    .membership-body { padding: 32px; }
+    .membership-features {
+      list-style: none; display: flex; flex-direction: column; gap: 14px;
+      margin-bottom: 28px;
+    }
+    .membership-features li {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 15px;
+    }
+    .membership-features li::before {
+      content: '✓'; width: 24px; height: 24px; border-radius: 50%;
+      background: var(--yellow); color: var(--g-dark);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 13px; flex-shrink: 0;
+    }
+
+    /* Lid form */
+    .lid-form { display: flex; flex-direction: column; gap: 16px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 13px; font-weight: 600; color: var(--muted); }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 13px 16px; border: 2px solid var(--border);
+      border-radius: 10px; font-size: 15px; outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      background: var(--white);
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--g-mid);
+      box-shadow: 0 0 0 3px rgba(26,107,58,.12);
+    }
+    .form-group textarea { resize: vertical; }
+
+    /* ══════════════════════════════════════════════════════
+       AGENDA
+    ══════════════════════════════════════════════════════ */
+    .agenda-list { display: flex; flex-direction: column; gap: 14px; margin-top: 48px; }
+    .agenda-item {
+      display: flex; align-items: center; gap: 24px;
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius); padding: 22px 28px;
+      transition: background .18s;
+    }
+    .agenda-item:hover { background: rgba(255,255,255,.11); }
+    .agenda-date {
+      min-width: 68px; text-align: center;
+      background: var(--yellow); color: var(--g-dark);
+      border-radius: 12px; padding: 10px 8px;
+    }
+    .agenda-month { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; }
+    .agenda-day   { font-size: 26px; font-weight: 900; line-height: 1; }
+    .agenda-info  { flex: 1; }
+    .agenda-info h4 { font-size: 17px; font-weight: 700; color: var(--white); }
+    .agenda-info p  { font-size: 14px; color: rgba(255,255,255,.58); margin-top: 3px; }
+    .agenda-tag-badge {
+      font-size: 11px; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--g-dark);
+      background: var(--yellow); border-radius: 100px;
+      padding: 4px 12px; white-space: nowrap; flex-shrink: 0;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       TESTIMONIALS
+    ══════════════════════════════════════════════════════ */
+    .testimonial-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 24px; margin-top: 56px;
+    }
+    .testimonial {
+      background: var(--white); border-radius: var(--radius);
+      padding: 36px; box-shadow: var(--shadow);
+      border-left: 4px solid var(--yellow);
+      transition: transform .22s;
+    }
+    .testimonial:hover { transform: translateY(-4px); }
+    .t-quote {
+      font-size: 16px; line-height: 1.72; color: var(--text);
+      margin-bottom: 24px; position: relative;
+    }
+    .t-quote::before {
+      content: '\201C'; font-size: 60px; line-height: .4;
+      color: var(--yellow); font-weight: 900;
+      display: block; margin-bottom: 10px;
+    }
+    .t-author { display: flex; align-items: center; gap: 12px; }
+    .t-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--g-pale); border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .t-name { font-size: 14px; font-weight: 700; }
+    .t-role { font-size: 12px; color: var(--muted); }
+
+    /* ══════════════════════════════════════════════════════
+       OVER ONS
+    ══════════════════════════════════════════════════════ */
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: center;
+    }
+    .about-photo {
+      width: 100%; aspect-ratio: 3/4; border-radius: var(--radius);
+    }
+    .about-stats {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px; margin-top: 8px;
+    }
+    .about-stat {
+      background: var(--g-pale); border-radius: 8px; padding: 7px 12px;
+      border-left: 3px solid var(--yellow);
+    }
+    .about-stat-num { font-size: 20px; font-weight: 900; color: var(--g-mid); }
+    .about-stat-lbl { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    /* Team row */
+    .team-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; margin-top: 48px; }
+    .team-card { text-align: center; }
+    .team-photo {
+      width: 100%; aspect-ratio: 1;
+      border-radius: 20px; overflow: hidden;
+      background: var(--g-pale);
+      border: 2px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .team-photo img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center top;  /* gezicht bovenaan */
+      display: block;
+    }
+    .team-name { font-size: 16px; font-weight: 700; color: #fff; }
+    .team-role { font-size: 13px; color: rgba(255,255,255,.75); margin-top: 4px; }
+
+    /* ══════════════════════════════════════════════════════
+       NIEUWS / ACTUEEL
+    ══════════════════════════════════════════════════════ */
+    .nieuws-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 24px; margin-top: 56px;
+    }
+    .nieuws-card {
+      background: var(--white); border-radius: var(--radius);
+      overflow: hidden; box-shadow: var(--shadow);
+      transition: transform .22s;
+    }
+    .nieuws-card:hover { transform: translateY(-4px); }
+    .nieuws-img {
+      width: 100%; aspect-ratio: 16/9;
+      background: var(--g-pale);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 44px; border-bottom: 1px solid var(--border);
+    }
+    .nieuws-body { padding: 26px; }
+    .nieuws-date { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    .nieuws-body h3 { font-size: 18px; margin-bottom: 8px; }
+    .nieuws-body p  { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+    .nieuws-link {
+      font-size: 14px; font-weight: 700; color: var(--g-mid);
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .nieuws-link::after { content: ' →'; }
+    .nieuws-link:hover { color: var(--g-dark); }
+
+    /* ══════════════════════════════════════════════════════
+       NIEUWSBRIEF
+    ══════════════════════════════════════════════════════ */
+    .newsletter-wrap {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: center;
+    }
+    .newsletter-benefits { display: flex; flex-direction: column; gap: 16px; margin-top: 28px; }
+    .nl-benefit {
+      display: flex; align-items: center; gap: 14px;
+      font-size: 15px; color: rgba(255,255,255,.85);
+    }
+    .nl-benefit-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: rgba(232,240,69,.15); border: 1px solid rgba(232,240,69,.3);
+      color: var(--yellow); display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .newsletter-form { background: rgba(255,255,255,.07); border-radius: var(--radius); padding: 36px; }
+    .newsletter-form h3 { color: var(--white); margin-bottom: 24px; }
+    .nl-input-row { display: flex; gap: 10px; margin-top: 14px; }
+    .nl-input-row input {
+      flex: 1; padding: 14px 16px; border: 2px solid rgba(255,255,255,.2);
+      border-radius: 10px; background: rgba(255,255,255,.08);
+      color: var(--white); font-size: 15px; outline: none;
+    }
+    .nl-input-row input::placeholder { color: rgba(255,255,255,.4); }
+    .nl-input-row input:focus { border-color: var(--yellow); }
+
+    /* ══════════════════════════════════════════════════════
+       CONTACT
+    ══════════════════════════════════════════════════════ */
+    .contact-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; margin-top: 56px;
+    }
+    .contact-info { display: flex; flex-direction: column; gap: 24px; }
+    .contact-item {
+      display: flex; gap: 16px; align-items: flex-start;
+    }
+    .contact-icon {
+      width: 48px; height: 48px; border-radius: 14px;
+      background: var(--yellow); color: var(--g-dark);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .contact-item h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: #fff; }
+    .contact-item p  { font-size: 14px; color: rgba(255,255,255,.85); }
+    .contact-item a  { color: var(--yellow); }
+    .contact-item a:hover { text-decoration: underline; }
+
+    .contact-map {
+      width: 100%; height: 340px; border-radius: var(--radius);
+      overflow: hidden; margin-top: 24px;
+      box-shadow: var(--shadow);
+      border: 2px solid var(--border);
+    }
+    #ecku-map { width: 100%; height: 100%; }
+
+    /* ══════════════════════════════════════════════════════
+       CTA BANNER
+    ══════════════════════════════════════════════════════ */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--g-dark) 0%, var(--g-mid) 100%);
+      padding: 100px 0; text-align: left;
+    }
+    .cta-banner h2 { color: var(--white); font-size: clamp(30px, 5vw, 54px); }
+    .cta-banner p  { color: rgba(255,255,255,.72); font-size: 18px; max-width: 480px; margin: 16px 0 40px; }
+    .cta-banner-btns { display: flex; justify-content: flex-start; gap: 14px; flex-wrap: wrap; }
+
+    /* ══════════════════════════════════════════════════════
+       IMPACT ROW
+    ══════════════════════════════════════════════════════ */
+    .impact-bar {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      background: var(--g-dark); border-radius: var(--radius);
+      overflow: hidden; margin-top: 16px; gap: 1px;
+    }
+    .impact-cell {
+      background: #0d3520; padding: 44px 24px; text-align: center;
+      transition: background .2s;
+    }
+    .impact-cell:hover { background: var(--g-mid); }
+    .impact-num { font-size: 48px; font-weight: 900; color: var(--yellow); line-height: 1; }
+    .impact-lbl { font-size: 14px; color: rgba(255,255,255,.65); margin-top: 8px; }
+
+    /* ══════════════════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════════════════ */
+    footer {
+      background: #071a0e; color: rgba(255,255,255,.55);
+      padding: 72px 0 32px;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px; padding-bottom: 48px;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+    .footer-brand p { font-size: 14px; line-height: 1.75; margin-top: 18px; }
+    .footer-logo-area { display: flex; align-items: center; gap: 12px; }
+    .footer-logo-img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+    .footer-logo-text { font-size: 18px; font-weight: 900; color: var(--white); }
+    .footer-logo-text span { color: var(--yellow); }
+    .footer-col h4 {
+      font-size: 12px; font-weight: 700; color: var(--white);
+      letter-spacing: .1em; text-transform: uppercase; margin-bottom: 18px;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul li a { font-size: 14px; transition: color .18s; }
+    .footer-col ul li a:hover { color: var(--yellow); }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 28px; font-size: 13px; flex-wrap: wrap; gap: 8px;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       SCROLL REVEAL
+    ══════════════════════════════════════════════════════ */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .65s ease, transform .65s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-l { opacity: 0; transform: translateX(-28px); transition: opacity .65s ease, transform .65s ease; }
+    .reveal-l.visible { opacity: 1; transform: none; }
+    .reveal-r { opacity: 0; transform: translateX(28px); transition: opacity .65s ease, transform .65s ease; }
+    .reveal-r.visible { opacity: 1; transform: none; }
+
+    /* ══════════════════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .pillars-grid, .projects-grid, .testimonial-grid, .nieuws-grid { grid-template-columns: 1fr 1fr; }
+      .team-grid { grid-template-columns: repeat(2,1fr); }
+      .impact-bar { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 768px) {
+      .nav-links, .nav-cta { display: none; }
+      .nav-burger { display: flex; }
+      .mobile-menu { top: 156px; }
+      .podcast-cards { grid-template-columns: 1fr; }
+      .section { padding: 64px 0; }
+      .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+      .hero-photo { display: none; }
+      .energie-grid, .lid-grid, .about-grid,
+      .newsletter-wrap, .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+      .pillars-grid, .projects-grid, .testimonial-grid,
+      .nieuws-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .footer-brand { grid-column: 1/-1; }
+      .agenda-tag-badge { display: none; }
+      .impact-bar { grid-template-columns: 1fr 1fr; }
+      .team-grid { grid-template-columns: repeat(2,1fr); }
+      .footer-bottom { flex-direction: column; text-align: center; }
+    }
+    @media (max-width: 480px) {
+      .footer-grid { grid-template-columns: 1fr; }
+      .about-stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER + NAV ══════════════════════════════════════════════ -->
+<header id="site-header">
+
+  <!-- Donkergroene achtergrond over volle breedte, header-afbeelding gecentreerd -->
+  <div class="header-bg">
+    <a href="#home" class="header-banner">
+      <img src="images/HEADERNieuw.png"
+           alt="ECKU – Energiecoöperatie Uithoorn & De Kwakel"
+           class="header-banner-img" />
+    </a>
+  </div>
+
+  <!-- Nav bar -->
+  <div class="nav-bar">
+    <div class="container nav-wrap">
+      <ul class="nav-links">
+        <li><a href="#home"             class="active">Home</a></li>
+        <li><a href="#actueel">Actueel</a></li>
+        <li><a href="#energie-besparen">Energie besparen</a></li>
+        <li><a href="#subsidie-checker">Subsidies</a></li>
+        <li><a href="#bespaarwidget">Bespaarwidget</a></li>
+        <li><a href="#projecten">Projecten</a></li>
+        <li><a href="#ai-adviseur">AI Adviseur</a></li>
+        <li><a href="#podcast">Podcast</a></li>
+        <li><a href="#over-ons">Over ons</a></li>
+        <li><a href="#nieuwsbrief">Nieuwsbrief</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <div class="nav-right">
+        <div class="nav-burger" id="burger" onclick="toggleMenu()">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#home"             onclick="closeMenu()">Home</a>
+  <a href="#actueel"          onclick="closeMenu()">Actueel</a>
+  <a href="#energie-besparen" onclick="closeMenu()">Energie besparen</a>
+  <a href="#subsidie-checker" onclick="closeMenu()">Subsidies</a>
+  <a href="#projecten"        onclick="closeMenu()">Projecten</a>
+  <a href="#podcast"          onclick="closeMenu()">Podcast</a>
+  <a href="#over-ons"         onclick="closeMenu()">Over ons</a>
+  <a href="#nieuwsbrief"      onclick="closeMenu()">Nieuwsbrief</a>
+  <a href="#contact"          onclick="closeMenu()">Contact</a>
+  <a href="#lid-worden" class="mob-cta" onclick="closeMenu()">⚡ Word lid — €12/jaar</a>
+</div>
+
+
+<!-- ══ HERO ══════════════════════════════════════════════════════ -->
+<section class="hero" id="home">
+  <div class="hero-bg-pattern"></div>
+  <div class="container">
+    <div class="hero-inner">
+
+      <!-- Text -->
+      <div class="hero-content">
+        <div class="hero-badge">⚡ Opgericht december 2025 · De Kwakel &amp; Uithoorn</div>
+        <h1>Samen <em>duurzame energie</em> opwekken in onze regio</h1>
+        <div class="hero-btns">
+          <a href="#lid-worden"  class="btn btn-yellow">⚡ Word lid — €12/jaar</a>
+          <a href="#projecten"   class="btn btn-outline-w">Bekijk projecten</a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="stat-num">€12</div>
+            <div class="stat-lbl">Lidmaatschap per jaar</div>
+          </div>
+          <div>
+            <div class="stat-num">2050</div>
+            <div class="stat-lbl">Streefjaar fossielvrij</div>
+          </div>
+          <div>
+            <div class="stat-num">2</div>
+            <div class="stat-lbl">Actieve projecten</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Photo area -->
+      <div class="hero-photo">
+        <div class="hero-photo-main">
+          <img src="images/gezonde omgeving.jpeg" alt="Gezonde groene omgeving" style="width:100%;height:100%;object-fit:cover;border-radius:24px;" />
+        </div>
+        <div class="hero-photo-badge">
+          Samen maken we Uithoorn<br>en De Kwakel duurzaam
+          <span>Energie Coöperatie De Kwakel &amp; Uithoorn</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ WAT IS ECKU ════════════════════════════════════════════════ -->
+<section class="section" id="wat-is-ecku" style="padding-bottom:24px;">
+  <div class="container">
+    <div class="reveal" style="margin:0 0 48px 0;">
+      <span class="eyebrow">Wie zijn wij</span>
+      <h2 style="color:#fff;">Wat kunnen wij voor jou als inwoner betekenen?</h2>
+      <p class="lead" style="margin:0;white-space:nowrap;">ECKU ondersteunt bewoners bij de stap naar duurzame energie — met kennis, projecten en een sterk lokaal netwerk.</p>
+    </div>
+    <div class="pillars-grid">
+      <div class="pillar reveal">
+        <img src="images/Samen.png" alt="Samen investeren" style="width:100%;height:180px;object-fit:cover;border-radius:12px;margin-bottom:16px;" />
+        <h3>Samen investeren</h3>
+        <p>Als coöperatie bundelen we de kracht van onze leden. Samen bereiken we meer dan individueel — in kennis, invloed en resultaat.</p>
+      </div>
+      <div class="pillar reveal">
+        <img src="images/Lokaal.png" alt="Lokale energie" style="width:100%;height:180px;object-fit:cover;border-radius:12px;margin-bottom:16px;" />
+        <h3>Lokale energie</h3>
+        <p>We wekken energie op in onze eigen regio. De opbrengst blijft lokaal en versterkt de gemeenschap in De Kwakel en Uithoorn.</p>
+      </div>
+      <div class="pillar reveal">
+        <img src="images/Buurt.png" alt="Winst voor de buurt" style="width:100%;height:180px;object-fit:cover;border-radius:12px;margin-bottom:16px;" />
+        <h3>Winst voor de buurt</h3>
+        <p>Van gas af, isoleren, zonnepanelen, warmtepompen — wij helpen bewoners stap voor stap naar een duurzaam en betaalbaar huis.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ IMPACT BAR ═════════════════════════════════════════════════ -->
+<section class="section-sm bg-cream" style="padding-top:0;">
+  <div class="container reveal">
+    <div class="impact-bar">
+      <div class="impact-cell">
+        <div class="impact-num">€12</div>
+        <div class="impact-lbl">Lidmaatschap per jaar</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-num">4×</div>
+        <div class="impact-lbl">Thema-avonden in 2026</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-num">1</div>
+        <div class="impact-lbl">Actief proefproject (Legmeer)</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-num">2050</div>
+        <div class="impact-lbl">Streefjaar 100% duurzaam</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ ENERGIE BESPAREN ═══════════════════════════════════════════ -->
+<section class="section" id="energie-besparen">
+  <div class="container">
+    <div class="reveal">
+      <span class="eyebrow">Energie besparen</span>
+      <h2 style="color:#fff;">Praktische tips voor jouw woning</h2>
+      <p class="lead" style="white-space:nowrap;">Bespaar energie, verlaag je rekening en draag bij aan een duurzamere toekomst.</p>
+    </div>
+    <!-- Binnenste grid: 5 blokjes links, 2 foto's rechts — zelfde hoogte -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:stretch;margin-top:56px;">
+
+      <!-- Tips lijst -->
+      <div class="tips-list reveal-l" style="margin:0;">
+        <div class="tip-item">
+          <div class="tip-icon">🌡️</div>
+          <div class="tip-body">
+            <h4>Isoleer je woning</h4>
+            <p>Spouwmuurisolatie, dakisolatie en vloerisolatie verminderen je energieverlies sterk. Vraag onze energiecoach om advies.</p>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">☀️</div>
+          <div class="tip-body">
+            <h4>Zonnepanelen plaatsen</h4>
+            <p>Wek zelf energie op met zonnepanelen. Via ECKU profiteer je van groepsaankopen en lokale expertise.</p>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">🔥</div>
+          <div class="tip-body">
+            <h4>Luchtwarmtepomp</h4>
+            <p>De meest toegankelijke stap van gas af. Een warmtepomp verwarmt je huis fossielvrij — ook in de Legmeer.</p>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">🔋</div>
+          <div class="tip-body">
+            <h4>Thuisbatterij of buurtbatterij</h4>
+            <p>Sla zelf opgewekte energie op voor gebruik als de zon niet schijnt. ECKU onderzoekt buurtbatterijen voor de regio.</p>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">💡</div>
+          <div class="tip-body">
+            <h4>Slim energiebeheer</h4>
+            <p>Met slimme meters en energiemanagementsystemen stuur je je verbruik automatisch bij.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Foto's — zelfde hoogte als de 5 blokjes -->
+      <div class="reveal-r" style="display:flex;flex-direction:column;gap:16px;">
+        <div class="photo-box" style="flex:1.5;min-height:0;">
+          <img src="images/maak een afbeelding vaenergiearme huis.jpg" alt="Energiezuinig huis" />
+        </div>
+        <div class="photo-box" style="flex:1;min-height:0;">
+          <img src="images/mwarmtepomphuis.jpg" alt="Warmtepomp woning" />
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Coach-blokje los eronder -->
+    <div class="coach-card reveal" style="margin-top:28px;">
+      <h3>🌱 Onze energiecoaches staan voor je klaar</h3>
+      <p>In januari 2026 starten onze energiecoaches met hun opleiding. Vanaf maart 2026 geven zij bewoners persoonlijk advies aan huis — gratis voor leden.</p>
+      <a href="#contact" class="btn btn-yellow btn-sm">Maak een afspraak</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ SUBSIDIE-CHECKER ═══════════════════════════════════════════ -->
+<section class="section" id="subsidie-checker">
+  <div class="container">
+    <div class="reveal" style="margin:0 0 48px 0;">
+      <span class="eyebrow">Subsidie-checker</span>
+      <h2 style="color:#fff;">Welke subsidies passen bij jou?</h2>
+      <p class="lead" style="color:rgba(255,255,255,.85);white-space:nowrap;">Beantwoord drie vragen en zie direct welke regelingen en subsidies voor jou beschikbaar zijn.</p>
+    </div>
+
+    <div class="reveal" style="background:rgba(255,255,255,.97);border-radius:24px;padding:40px 48px;box-shadow:0 8px 40px rgba(0,0,0,.15);max-width:900px;margin:0 auto;">
+
+      <!-- Stap 1: Eigendomssituatie -->
+      <div class="sub-stap" id="sub-stap-1">
+        <div class="sub-stap-header">
+          <div class="sub-stap-num">1</div>
+          <h4>Ben je eigenaar of huurder?</h4>
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;">
+          <button class="sub-keuze-btn" onclick="selectSub('eigendom','eigenaar',this)">🏠 Eigenaar-bewoner</button>
+          <button class="sub-keuze-btn" onclick="selectSub('eigendom','vve',this)">🏢 VvE / Appartement</button>
+          <button class="sub-keuze-btn" onclick="selectSub('eigendom','huurder',this)">🔑 Huurder (sociale huur)</button>
+          <button class="sub-keuze-btn" onclick="selectSub('eigendom','huurder-vrij',this)">🏡 Huurder (vrije sector)</button>
+        </div>
+      </div>
+
+      <div class="sub-divider"></div>
+
+      <!-- Stap 2: Maatregelen -->
+      <div class="sub-stap" id="sub-stap-2">
+        <div class="sub-stap-header">
+          <div class="sub-stap-num">2</div>
+          <h4>Welke maatregel overweeg je?</h4>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:16px;">
+          <button class="sub-keuze-btn" onclick="selectSub('maatregel','isolatie',this)">🌡️ Isolatie</button>
+          <button class="sub-keuze-btn" onclick="selectSub('maatregel','zonnepanelen',this)">☀️ Zonnepanelen</button>
+          <button class="sub-keuze-btn" onclick="selectSub('maatregel','warmtepomp',this)">🔥 Warmtepomp</button>
+          <button class="sub-keuze-btn" onclick="selectSub('maatregel','glas',this)">🪟 HR-glas / kozijnen</button>
+          <button class="sub-keuze-btn" onclick="selectSub('maatregel','ketel',this)">🚿 HR-ketel</button>
+          <button class="sub-keuze-btn" onclick="selectSub('maatregel','ventilatie',this)">💨 Ventilatie (WTW)</button>
+        </div>
+      </div>
+
+      <div class="sub-divider"></div>
+
+      <!-- Stap 3: Inkomen -->
+      <div class="sub-stap" id="sub-stap-3">
+        <div class="sub-stap-header">
+          <div class="sub-stap-num">3</div>
+          <h4>Wat is je inkomenssituatie? <span style="font-weight:400;font-size:13px;color:#888;">(optioneel — voor extra regelingen)</span></h4>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:16px;">
+          <button class="sub-keuze-btn" onclick="selectSub('inkomen','laag',this)">💶 Laag inkomen / uitkering</button>
+          <button class="sub-keuze-btn" onclick="selectSub('inkomen','midden',this)">💼 Modaal inkomen</button>
+          <button class="sub-keuze-btn" onclick="selectSub('inkomen','hoog',this)">📈 Hoger inkomen</button>
+          <button class="sub-keuze-btn" onclick="selectSub('inkomen','onbekend',this)">❓ Weet ik niet</button>
+        </div>
+      </div>
+
+      <!-- Resultaten knop -->
+      <div style="text-align:center;margin-top:32px;">
+        <button onclick="toonSubsidies()" class="btn btn-green" style="font-size:16px;padding:16px 40px;">
+          🔍 Toon mijn subsidies
+        </button>
+      </div>
+
+      <!-- Resultaten -->
+      <div id="sub-resultaten" style="display:none;margin-top:40px;"></div>
+
+    </div>
+    <p style="font-size:12px;color:rgba(255,255,255,.6);margin-top:20px;">De resultaten van deze berekening zijn uitsluitend indicatief. Aan de uitkomsten kunnen geen rechten worden ontleend.</p>
+  </div>
+</section>
+
+<style>
+  .sub-stap { margin-bottom: 4px; }
+  .sub-stap-header { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
+  .sub-stap-header h4 { margin: 0; color: var(--g-dark); font-size: 17px; }
+  .sub-stap-num {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--g-mid); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 15px; flex-shrink: 0;
+  }
+  .sub-divider { height: 1px; background: var(--border); margin: 28px 0; }
+  .sub-keuze-btn {
+    padding: 12px 20px; border-radius: 50px;
+    border: 2px solid var(--g-mid); background: transparent;
+    color: var(--g-dark) !important; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all .18s;
+  }
+  .sub-keuze-btn.actief, .sub-keuze-btn:hover {
+    background: var(--g-mid); color: #fff !important;
+  }
+  .sub-card {
+    border-radius: 16px; padding: 22px 24px; margin-bottom: 14px;
+    border-left: 5px solid var(--g-mid);
+    background: #f0f9f0; display: flex; gap: 16px; align-items: flex-start;
+  }
+  .sub-card.goud { border-left-color: #f5a623; background: #fffbf0; }
+  .sub-card.blauw { border-left-color: #2196f3; background: #f0f6ff; }
+  .sub-card.grijs { border-left-color: #aaa; background: #f8f8f8; }
+  .sub-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+  .sub-info { flex: 1; }
+  .sub-naam { font-size: 16px; font-weight: 800; color: var(--g-dark); margin-bottom: 4px; }
+  .sub-desc { font-size: 14px; color: #555; margin-bottom: 8px; line-height: 1.5; }
+  .sub-bedrag {
+    display: inline-block; background: var(--g-mid); color: #fff;
+    border-radius: 50px; padding: 4px 14px; font-size: 13px; font-weight: 700;
+    margin-right: 8px;
+  }
+  .sub-bedrag.goud { background: #f5a623; }
+  .sub-bedrag.blauw { background: #2196f3; }
+  .sub-link {
+    display: inline-block; font-size: 13px; font-weight: 600;
+    color: var(--g-mid); text-decoration: underline; margin-top: 8px;
+  }
+  .sub-geen {
+    text-align: center; padding: 32px; color: #888;
+    font-size: 16px; background: #f8f8f8; border-radius: 16px;
+  }
+</style>
+
+<script>
+(function(){
+  const keuzes = { eigendom: null, maatregel: null, inkomen: null };
+
+  // Alle subsidies database
+  const subsidies = [
+    {
+      naam: 'ISDE – Investeringssubsidie Duurzame Energie',
+      icon: '⚡', kleur: 'groen',
+      bedrag: 'Tot €2.850 per warmtepomp',
+      desc: 'Nationale subsidie voor warmtepompen, zonneboilers en isolatie. Aanvragen via RVO.nl na installatie.',
+      link: 'https://www.rvo.nl/subsidies-financiering/isde',
+      linkTekst: 'Meer info via RVO.nl',
+      voorwaarden: { eigendom: ['eigenaar','vve'], maatregel: ['warmtepomp','isolatie'] }
+    },
+    {
+      naam: 'Salderingsregeling – Zonnepanelen',
+      icon: '☀️', kleur: 'goud',
+      bedrag: 'Teruglevering verrekend t/m 2027',
+      desc: 'Wat je teruggeeft aan het net telt mee als verbruik. Geldt voor eigenaren met zonnepanelen op eigen dak.',
+      link: 'https://www.rijksoverheid.nl/onderwerpen/duurzame-energie/zonnepanelen',
+      linkTekst: 'Meer info Rijksoverheid',
+      voorwaarden: { eigendom: ['eigenaar'], maatregel: ['zonnepanelen'] }
+    },
+    {
+      naam: '0% BTW op zonnepanelen',
+      icon: '💰', kleur: 'goud',
+      bedrag: '21% belastingvoordeel',
+      desc: 'Geen BTW betalen op aankoop én installatie van zonnepanelen op woningen. Automatisch verrekend bij installateur.',
+      link: 'https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/bijzondere_situaties/zonnepanelen/',
+      linkTekst: 'Belastingdienst info',
+      voorwaarden: { eigendom: ['eigenaar','vve'], maatregel: ['zonnepanelen'] }
+    },
+    {
+      naam: 'Energiebespaarlening (SVn)',
+      icon: '🏦', kleur: 'blauw',
+      bedrag: 'Lening €5.000 – €65.000 laag rente',
+      desc: 'Voordelige lening van het Stimuleringsfonds Volkshuisvesting voor energiebesparende maatregelen aan je eigen woning.',
+      link: 'https://www.energiebespaarlening.nl',
+      linkTekst: 'Bereken je lening',
+      voorwaarden: { eigendom: ['eigenaar'], maatregel: ['isolatie','warmtepomp','zonnepanelen','glas','ventilatie','ketel'] }
+    },
+    {
+      naam: 'Warmtefonds – Nul-op-de-meter lening',
+      icon: '🌱', kleur: 'groen',
+      bedrag: 'Renteloze lening tot €25.000',
+      desc: 'Voor lagere inkomens: renteloze lening voor een warmtepakket. Betaling via maandelijkse energiebesparing.',
+      link: 'https://www.warmtefonds.nl',
+      linkTekst: 'Warmtefonds.nl',
+      voorwaarden: { eigendom: ['eigenaar'], maatregel: ['warmtepomp','isolatie','ventilatie'], inkomen: ['laag','midden'] }
+    },
+    {
+      naam: 'Gemeente Uithoorn – Duurzaamheidslening',
+      icon: '🏛️', kleur: 'groen',
+      bedrag: 'Informeer bij gemeente',
+      desc: 'Gemeente Uithoorn heeft regelingen voor energiebesparing. Neem contact op via de gemeentewebsite of vraag ECKU om advies.',
+      link: 'https://www.uithoorn.nl',
+      linkTekst: 'Gemeente Uithoorn',
+      voorwaarden: { eigendom: ['eigenaar','huurder','vve'], maatregel: ['isolatie','warmtepomp','zonnepanelen','glas','ventilatie','ketel'] }
+    },
+    {
+      naam: 'VvE Energiebespaarlening',
+      icon: '🏢', kleur: 'blauw',
+      bedrag: 'Lening per VvE tot €1,5 mln',
+      desc: 'Specifieke lening voor Verenigingen van Eigenaren voor collectieve energiemaatregelen in appartementen.',
+      link: 'https://www.energiebespaarlening.nl/vve',
+      linkTekst: 'VvE lening info',
+      voorwaarden: { eigendom: ['vve'], maatregel: ['isolatie','warmtepomp','zonnepanelen','glas','ventilatie'] }
+    },
+    {
+      naam: 'Huurtoeslag + Energiekorting',
+      icon: '📋', kleur: 'blauw',
+      bedrag: 'Afhankelijk van inkomen',
+      desc: 'Als huurder in sociale huur heb je recht op huurtoeslag. Vraag ook je verhuurder om energiemaatregelen — die zijn verplicht bij slecht label.',
+      link: 'https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/toeslagen/huurtoeslag/',
+      linkTekst: 'Huurtoeslag info',
+      voorwaarden: { eigendom: ['huurder'], maatregel: ['isolatie','warmtepomp','zonnepanelen','glas','ventilatie','ketel'] }
+    },
+    {
+      naam: 'ECKU Groepsaankoop',
+      icon: '🤝', kleur: 'groen',
+      bedrag: 'Tot 15% korting via groepsaankoop',
+      desc: 'Via ECKU profiteer je van groepsaankopen voor zonnepanelen, warmtepompen en isolatie. Lokaal geregeld, betaalbaar voor iedereen.',
+      link: '#contact',
+      linkTekst: 'Aanmelden via ECKU',
+      voorwaarden: { eigendom: ['eigenaar','vve'], maatregel: ['isolatie','warmtepomp','zonnepanelen','glas'] }
+    },
+  ];
+
+  window.selectSub = function(type, waarde, btn) {
+    document.querySelectorAll(`[onclick*="selectSub('${type}'"]`).forEach(b => b.classList.remove('actief'));
+    btn.classList.add('actief');
+    keuzes[type] = waarde;
+  };
+
+  window.toonSubsidies = function() {
+    const resultDiv = document.getElementById('sub-resultaten');
+    if (!keuzes.eigendom || !keuzes.maatregel) {
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = `<div class="sub-geen">⚠️ Selecteer minimaal <strong>eigendom</strong> en <strong>maatregel</strong> om subsidies te zien.</div>`;
+      return;
+    }
+
+    const gevonden = subsidies.filter(s => {
+      const eigendomOK = s.voorwaarden.eigendom.includes(keuzes.eigendom);
+      const maatregelOK = s.voorwaarden.maatregel.includes(keuzes.maatregel);
+      const inkomenOK = !s.voorwaarden.inkomen || !keuzes.inkomen ||
+        keuzes.inkomen === 'onbekend' || s.voorwaarden.inkomen.includes(keuzes.inkomen);
+      return eigendomOK && maatregelOK && inkomenOK;
+    });
+
+    resultDiv.style.display = 'block';
+
+    if (gevonden.length === 0) {
+      resultDiv.innerHTML = `<div class="sub-geen">😔 Geen specifieke subsidies gevonden voor deze combinatie. <br><a href="#contact" style="color:var(--g-mid);">Vraag ECKU om advies</a> — wij weten wat er lokaal beschikbaar is.</div>`;
+      return;
+    }
+
+    const kleurMap = { groen: '', goud: ' goud', blauw: ' blauw' };
+    const bedragKleur = { groen: '', goud: ' goud', blauw: ' blauw' };
+
+    resultDiv.innerHTML = `
+      <h3 style="color:var(--g-dark);margin-bottom:20px;">✅ ${gevonden.length} passende regelingen gevonden</h3>
+      ${gevonden.map(s => `
+        <div class="sub-card${kleurMap[s.kleur]}">
+          <div class="sub-icon">${s.icon}</div>
+          <div class="sub-info">
+            <div class="sub-naam">${s.naam}</div>
+            <div class="sub-desc">${s.desc}</div>
+            <span class="sub-bedrag${bedragKleur[s.kleur]}">${s.bedrag}</span>
+            <br><a href="${s.link}" target="_blank" class="sub-link">→ ${s.linkTekst}</a>
+          </div>
+        </div>
+      `).join('')}
+      <div style="margin-top:24px;padding:20px;background:#f0f9f0;border-radius:12px;text-align:center;">
+        <p style="color:var(--g-dark);margin-bottom:12px;">Wil je weten welke subsidies specifiek voor jouw situatie beschikbaar zijn?</p>
+        <a href="#ai-adviseur" class="btn btn-green">Vraag het aan Micky</a>
+        &nbsp;
+        <a href="#contact" class="btn btn-outline-g">Contact ECKU</a>
+      </div>
+      <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:16px;">De resultaten van deze berekening zijn uitsluitend indicatief. Aan de uitkomsten kunnen geen rechten worden ontleend.</p>
+    `;
+    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+})();
+</script>
+
+<!-- ══ BESPAARWIDGET ══════════════════════════════════════════════ -->
+<section class="section" id="bespaarwidget">
+  <div class="container">
+    <div class="reveal" style="margin:0 0 48px 0;">
+      <span class="eyebrow">Bereken jouw besparing</span>
+      <h2 style="color:#fff;">Hoeveel kun jij besparen?</h2>
+      <p class="lead" style="color:rgba(255,255,255,.85);white-space:nowrap;">Vul je woninggegevens in en zie direct welke maatregelen het meest opleveren.</p>
+    </div>
+
+    <div class="reveal" style="background:rgba(255,255,255,.97);border-radius:24px;padding:40px 48px;box-shadow:0 8px 40px rgba(0,0,0,.15);max-width:900px;margin:0 auto;">
+
+      <!-- Stap 1: Woningtype -->
+      <div style="margin-bottom:32px;">
+        <h4 style="margin-bottom:16px;color:var(--g-dark);">1. Wat voor woning heb je?</h4>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;" id="woning-keuze">
+          <button class="woning-btn active" data-type="rijtjeshuis" onclick="selectWoning(this)">🏠 Rijtjeshuis</button>
+          <button class="woning-btn" data-type="hoekwoning" onclick="selectWoning(this)">🏡 Hoekwoning</button>
+          <button class="woning-btn" data-type="vrijstaand" onclick="selectWoning(this)">🏰 Vrijstaand</button>
+          <button class="woning-btn" data-type="appartement" onclick="selectWoning(this)">🏢 Appartement</button>
+          <button class="woning-btn" data-type="twee-onder-een-kap" onclick="selectWoning(this)">🏘️ Twee-onder-één-kap</button>
+        </div>
+      </div>
+
+      <!-- Stap 2: Bouwjaar -->
+      <div style="margin-bottom:32px;">
+        <h4 style="margin-bottom:8px;color:var(--g-dark);">2. Bouwjaar woning: <span id="bouwjaar-label" style="color:var(--g-mid);font-weight:800;">vóór 1975</span></h4>
+        <input type="range" id="bouwjaar-slider" min="0" max="4" value="0" step="1"
+          oninput="updateBouwjaar(this.value)"
+          style="width:100%;accent-color:var(--g-mid);height:6px;cursor:pointer;" />
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;margin-top:4px;">
+          <span>vóór 1975</span><span>1975–1990</span><span>1991–2005</span><span>2006–2020</span><span>na 2020</span>
+        </div>
+      </div>
+
+      <!-- Stap 3: Verbruik -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:32px;">
+        <div>
+          <h4 style="margin-bottom:8px;color:var(--g-dark);">3. Gasverbruik: <span id="gas-label" style="color:var(--g-mid);font-weight:800;">1.800 m³/jaar</span></h4>
+          <input type="range" id="gas-slider" min="500" max="4000" value="1800" step="100"
+            oninput="updateSlider('gas-label', this.value, ' m³/jaar'); berekenBesparing()"
+            style="width:100%;accent-color:var(--g-mid);height:6px;cursor:pointer;" />
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;margin-top:4px;">
+            <span>500</span><span>2.000</span><span>4.000 m³</span>
+          </div>
+        </div>
+        <div>
+          <h4 style="margin-bottom:8px;color:var(--g-dark);">4. Elektriciteitsverbruik: <span id="elek-label" style="color:var(--g-mid);font-weight:800;">3.500 kWh/jaar</span></h4>
+          <input type="range" id="elek-slider" min="1000" max="8000" value="3500" step="100"
+            oninput="updateSlider('elek-label', this.value, ' kWh/jaar'); berekenBesparing()"
+            style="width:100%;accent-color:var(--g-mid);height:6px;cursor:pointer;" />
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;margin-top:4px;">
+            <span>1.000</span><span>4.500</span><span>8.000 kWh</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stap 4: Maatregelen -->
+      <div style="margin-bottom:36px;">
+        <h4 style="margin-bottom:16px;color:var(--g-dark);">5. Welke maatregelen overweeg je?</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
+          <label class="maatregel-check">
+            <input type="checkbox" checked onchange="berekenBesparing()"> 🌡️ Isolatie (dak/muur/vloer)
+          </label>
+          <label class="maatregel-check">
+            <input type="checkbox" checked onchange="berekenBesparing()"> ☀️ Zonnepanelen (10 panelen)
+          </label>
+          <label class="maatregel-check">
+            <input type="checkbox" onchange="berekenBesparing()"> 🔥 Luchtwarmtepomp
+          </label>
+          <label class="maatregel-check">
+            <input type="checkbox" onchange="berekenBesparing()"> 🔋 Thuisbatterij
+          </label>
+          <label class="maatregel-check">
+            <input type="checkbox" onchange="berekenBesparing()"> 💡 LED-verlichting
+          </label>
+          <label class="maatregel-check">
+            <input type="checkbox" onchange="berekenBesparing()"> 🚿 HR-ketel vervangen
+          </label>
+        </div>
+      </div>
+
+      <!-- Resultaten -->
+      <div id="bespaar-resultaat" style="background:linear-gradient(135deg,#0f3d1e,#1a6b3a);border-radius:16px;padding:32px;color:#fff;">
+        <h3 style="margin-bottom:24px;color:#fff;text-align:center;">Jouw geschatte jaarlijkse besparing</h3>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;text-align:center;margin-bottom:24px;">
+          <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:20px;">
+            <div id="res-geld" style="font-size:36px;font-weight:900;color:var(--yellow);">€ –</div>
+            <div style="font-size:13px;opacity:.8;margin-top:4px;">Kostenbesparing</div>
+          </div>
+          <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:20px;">
+            <div id="res-co2" style="font-size:36px;font-weight:900;color:#7dffb3;">– kg</div>
+            <div style="font-size:13px;opacity:.8;margin-top:4px;">CO₂-reductie</div>
+          </div>
+          <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:20px;">
+            <div id="res-terugverdien" style="font-size:36px;font-weight:900;color:#fff;">– jr</div>
+            <div style="font-size:13px;opacity:.8;margin-top:4px;">Gem. terugverdientijd</div>
+          </div>
+        </div>
+        <!-- Maatregelen breakdown -->
+        <div id="res-breakdown" style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;"></div>
+        <div style="text-align:center;font-size:12px;opacity:.6;margin-bottom:20px;">
+          De resultaten van deze berekening zijn uitsluitend indicatief. Aan de uitkomsten kunnen geen rechten worden ontleend.
+        </div>
+        <div style="text-align:center;">
+          <a href="#ai-adviseur" class="btn btn-yellow">Vraag persoonlijk advies aan Micky</a>
+        </div>
+      </div>
+
+    </div>
+    <p style="font-size:12px;color:rgba(255,255,255,.6);margin-top:20px;">De resultaten van deze berekening zijn uitsluitend indicatief. Aan de uitkomsten kunnen geen rechten worden ontleend.</p>
+  </div>
+</section>
+
+<style>
+  .woning-btn {
+    padding: 10px 18px; border-radius: 50px; border: 2px solid var(--g-mid);
+    background: transparent; color: var(--g-dark); font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all .18s;
+  }
+  .woning-btn.active, .woning-btn:hover {
+    background: var(--g-mid); color: #fff;
+  }
+  .maatregel-check {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--g-pale); border-radius: 10px; padding: 12px 16px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    border: 2px solid transparent; transition: border-color .18s;
+    color: #1a5c2e !important;
+  }
+  .maatregel-check:hover { border-color: var(--g-mid); }
+  .maatregel-check input { accent-color: var(--g-mid); width:16px; height:16px; cursor:pointer; }
+  .breakdown-row {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,.08); border-radius: 8px; padding: 10px 16px;
+    font-size: 14px;
+  }
+  .breakdown-euro { font-weight: 700; color: var(--yellow); }
+</style>
+
+<script>
+(function() {
+  const GASPRIJS = 1.45;   // €/m³
+  const STROOMPRIJS = 0.32; // €/kWh
+
+  const maatregelen = [
+    { naam: '🌡️ Isolatie',         gasRed: 0.25, elekRed: 0.05, invest: 8000,  co2PerM3: 1.88 },
+    { naam: '☀️ Zonnepanelen',      gasRed: 0,    elekRed: 0.35, invest: 6000,  co2PerKwh: 0.45 },
+    { naam: '🔥 Warmtepomp',        gasRed: 0.70, elekRed: -0.20,invest: 12000, co2PerM3: 1.88 },
+    { naam: '🔋 Thuisbatterij',     gasRed: 0,    elekRed: 0.15, invest: 5000,  co2PerKwh: 0.45 },
+    { naam: '💡 LED-verlichting',   gasRed: 0,    elekRed: 0.08, invest: 300,   co2PerKwh: 0.45 },
+    { naam: '🚿 HR-ketel',          gasRed: 0.12, elekRed: 0,    invest: 2500,  co2PerM3: 1.88 },
+  ];
+
+  window.selectWoning = function(btn) {
+    document.querySelectorAll('.woning-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    berekenBesparing();
+  };
+
+  window.updateBouwjaar = function(val) {
+    const labels = ['vóór 1975','1975–1990','1991–2005','2006–2020','na 2020'];
+    document.getElementById('bouwjaar-label').textContent = labels[val];
+    berekenBesparing();
+  };
+
+  window.updateSlider = function(id, val, suffix) {
+    document.getElementById(id).textContent = Number(val).toLocaleString('nl') + suffix;
+  };
+
+  window.berekenBesparing = function() {
+    const gas  = +document.getElementById('gas-slider').value;
+    const elek = +document.getElementById('elek-slider').value;
+    const checks = document.querySelectorAll('.maatregel-check input[type=checkbox]');
+
+    let totaalGeld = 0, totaalCO2 = 0, totaalInvest = 0;
+    const breakdown = [];
+
+    checks.forEach((cb, i) => {
+      if (!cb.checked) return;
+      const m = maatregelen[i];
+      const gasBespaard  = gas  * m.gasRed;
+      const elekBespaard = elek * m.elekRed;
+      const euro = Math.round(gasBespaard * GASPRIJS + elekBespaard * STROOMPRIJS);
+      const co2  = Math.round(gasBespaard * (m.co2PerM3 || 0) + elekBespaard * (m.co2PerKwh || 0));
+      totaalGeld   += euro;
+      totaalCO2    += co2;
+      totaalInvest += m.invest;
+      if (euro !== 0) breakdown.push({ naam: m.naam, euro, invest: m.invest });
+    });
+
+    const terugverdien = totaalGeld > 0 ? Math.round(totaalInvest / totaalGeld) : '–';
+
+    document.getElementById('res-geld').textContent = '€ ' + totaalGeld.toLocaleString('nl');
+    document.getElementById('res-co2').textContent  = totaalCO2.toLocaleString('nl') + ' kg';
+    document.getElementById('res-terugverdien').textContent = terugverdien + (terugverdien !== '–' ? ' jr' : '');
+
+    const bd = document.getElementById('res-breakdown');
+    bd.innerHTML = breakdown.map(b =>
+      `<div class="breakdown-row">
+        <span>${b.naam}</span>
+        <span class="breakdown-euro">€ ${b.euro.toLocaleString('nl')}/jaar</span>
+      </div>`
+    ).join('');
+  };
+
+  // Start berekening
+  document.addEventListener('DOMContentLoaded', berekenBesparing);
+  setTimeout(berekenBesparing, 100);
+})();
+</script>
+
+<!-- ══ PROJECTEN ══════════════════════════════════════════════════ -->
+<section class="section bg-cream" id="projecten">
+  <div class="container">
+    <div class="reveal">
+      <span class="eyebrow">Onze projecten</span>
+      <h2 style="color:#fff;">Wat doen we in de buurt?</h2>
+      <p class="lead" style="white-space:nowrap;">Concrete initiatieven dichtbij huis — van proefwijk tot energiecoaches en beleidsbeïnvloeding.</p>
+    </div>
+    <div class="projects-grid">
+
+      <div class="project-card reveal">
+        <div class="project-img">
+          <img src="images/Legmeer.jpg" alt="De Legmeer, Uithoorn" style="width:100%;height:100%;object-fit:cover;display:block;" />
+        </div>
+        <div class="project-body">
+          <span class="project-tag">Proefproject</span>
+          <h3>De Legmeer</h3>
+          <p>ECKU ondersteunt bewoners van de Legmeer bij de overgang van gas naar duurzame warmteoplossingen. We onderzoeken gezamenlijke aanpakken voor isolatie en luchtwarmtepompen.</p>
+          <div class="project-meta">📍 Legmeer, Uithoorn</div>
+          <a href="#contact" class="btn btn-outline-g btn-sm" style="margin-top:16px;">Meer info</a>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-img">
+          <img src="images/Energiecoach.png" alt="Energiecoach" style="width:100%;height:100%;object-fit:cover;display:block;" />
+        </div>
+        <div class="project-body">
+          <span class="project-tag">Opleiding · 2026</span>
+          <h3>Energiecoaches</h3>
+          <p>Vanaf januari 2026 leiden wij energiecoaches op die bewoners persoonlijk begeleiden bij het verduurzamen van hun woning. Gratis advies aan huis voor leden.</p>
+          <div class="project-meta">📍 Start: maart 2026</div>
+          <a href="#contact" class="btn btn-outline-g btn-sm" style="margin-top:16px;">Aanmelden als coach</a>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-img">
+          <img src="images/res.png" alt="Regionale Energiestrategie" style="width:100%;height:100%;object-fit:cover;display:block;" />
+        </div>
+        <div class="project-body">
+          <span class="project-tag">Beleid</span>
+          <h3>RES Samenwerking</h3>
+          <p>ECKU voert gesprekken met gemeente Uithoorn over de Regionale Energietransitie Strategie. Wij zorgen dat bewonersbelangen gehoord worden in de energieplannen.</p>
+          <div class="project-meta">📍 Gemeente Uithoorn</div>
+          <a href="#contact" class="btn btn-outline-g btn-sm" style="margin-top:16px;">Meer info</a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══ LID WORDEN ═════════════════════════════════════════════════ -->
+<section class="section" id="lid-worden">
+  <div class="container">
+    <div class="reveal">
+      <span class="eyebrow">Lid worden</span>
+      <h2 style="color:#fff;">Sluit je aan bij ECKU</h2>
+      <p class="lead" style="white-space:nowrap;">Voor slechts €12 per jaar draag je bij aan een duurzame energietoekomst in De Kwakel en Uithoorn.</p>
+    </div>
+    <div class="lid-grid">
+
+      <!-- Membership card -->
+      <div class="reveal-l">
+        <div class="membership-card">
+          <div class="membership-header">
+            <div style="font-size:13px;opacity:.7;margin-bottom:8px;letter-spacing:.05em;text-transform:uppercase;">Lidmaatschap ECKU</div>
+            <div class="membership-price"><sub>€</sub>12</div>
+            <div class="membership-period">per jaar</div>
+          </div>
+          <div class="membership-body">
+            <ul class="membership-features">
+              <li>Toegang tot alle evenementen &amp; thema-avonden</li>
+              <li>Gratis advies van onze energiecoaches</li>
+              <li>Stem op de Algemene Ledenvergadering</li>
+              <li>Profiteer van groepsaankopen (zonnepanelen, isolatie)</li>
+              <li>Ontvang de nieuwsbrief met praktische tips</li>
+              <li>Meedenken over lokale energieprojecten</li>
+              <li>Bijdragen aan een fossielvrij De Kwakel &amp; Uithoorn</li>
+            </ul>
+            <a href="#lid-form" class="btn btn-yellow" style="width:100%;justify-content:center;">⚡ Meld je aan als lid</a>
+          </div>
+        </div>
+
+        <div class="photo-box" style="height:200px;margin-top:20px;">
+          <div class="photo-icon">📸</div>
+          <div>Foto van leden of een evenement</div>
+        </div>
+      </div>
+
+      <!-- Sign-up form -->
+      <div class="reveal-r" id="lid-form">
+        <h3 style="margin-bottom:8px;">Aanmeldformulier</h3>
+        <p style="font-size:15px;color:var(--muted);margin-bottom:28px;">Vul het formulier in en wij nemen contact met je op.</p>
+        <form class="lid-form" onsubmit="handleLidForm(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Voornaam *</label>
+              <input type="text" placeholder="Jan" required />
+            </div>
+            <div class="form-group">
+              <label>Achternaam *</label>
+              <input type="text" placeholder="Jansen" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>E-mailadres *</label>
+            <input type="email" placeholder="jan@voorbeeld.nl" required />
+          </div>
+          <div class="form-group">
+            <label>Telefoonnummer</label>
+            <input type="tel" placeholder="+31 6 12345678" />
+          </div>
+          <div class="form-group">
+            <label>Woonplaats *</label>
+            <select required>
+              <option value="">Selecteer...</option>
+              <option>De Kwakel</option>
+              <option>Uithoorn</option>
+              <option>Omgeving</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Ik wil ook...</label>
+            <select>
+              <option value="">Alleen lid worden</option>
+              <option>Lid worden + energiecoach volgen</option>
+              <option>Lid worden + vrijwilliger worden</option>
+              <option>Lid worden + nieuwsbrief ontvangen</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Opmerking of vraag</label>
+            <textarea rows="3" placeholder="Bijv. ik ben geïnteresseerd in het Legmeer project..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-green">Aanmelden als lid ⚡</button>
+          <p style="font-size:12px;color:var(--muted);">* Verplichte velden. Je gegevens worden niet gedeeld met derden.</p>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ AGENDA ═════════════════════════════════════════════════════ -->
+<section class="section bg-dark" id="agenda">
+  <div class="container">
+    <div class="reveal">
+      <span class="eyebrow">Agenda 2026</span>
+      <h2>Evenementen &amp; thema-avonden</h2>
+      <p class="lead">Elk kwartaal zoomen we in op een actueel energiethema. Kom ook!</p>
+    </div>
+    <div class="agenda-list">
+
+      <div class="agenda-item reveal">
+        <div class="agenda-date">
+          <div class="agenda-month">Jan</div>
+          <div class="agenda-day">26</div>
+        </div>
+        <div class="agenda-info">
+          <h4>Start opleiding Energiecoaches</h4>
+          <p>Training voor energiecoaches die vanaf maart 2026 actief aan de slag gaan · Uithoorn</p>
+        </div>
+        <span class="agenda-tag-badge">Opleiding</span>
+      </div>
+
+      <div class="agenda-item reveal">
+        <div class="agenda-date">
+          <div class="agenda-month">Q1</div>
+          <div class="agenda-day">'26</div>
+        </div>
+        <div class="agenda-info">
+          <h4>Thema-avond: Nieuwe Energiewet 2026</h4>
+          <p>Wat verandert er per 1 januari 2026 voor bewoners en coöperaties? · Locatie t.b.a.</p>
+        </div>
+        <span class="agenda-tag-badge">Thema-avond</span>
+      </div>
+
+      <div class="agenda-item reveal">
+        <div class="agenda-date">
+          <div class="agenda-month">Q2</div>
+          <div class="agenda-day">'26</div>
+        </div>
+        <div class="agenda-info">
+          <h4>Thema-avond: Batterijen – thuis &amp; buurt</h4>
+          <p>Buurtbatterijen versus thuisopslag — wat past bij onze regio?</p>
+        </div>
+        <span class="agenda-tag-badge">Thema-avond</span>
+      </div>
+
+      <div class="agenda-item reveal">
+        <div class="agenda-date">
+          <div class="agenda-month">Q3</div>
+          <div class="agenda-day">'26</div>
+        </div>
+        <div class="agenda-info">
+          <h4>Thema-avond: Aardwarmte &amp; Geothermie</h4>
+          <p>Hoe kan warmte uit de bodem bijdragen aan een fossielvrij Uithoorn?</p>
+        </div>
+        <span class="agenda-tag-badge">Thema-avond</span>
+      </div>
+
+      <div class="agenda-item reveal">
+        <div class="agenda-date">
+          <div class="agenda-month">Q4</div>
+          <div class="agenda-day">'26</div>
+        </div>
+        <div class="agenda-info">
+          <h4>Thema-avond: Energiemanagement</h4>
+          <p>Slim omgaan met energieverbruik — tools, tips en technologie voor thuis</p>
+        </div>
+        <span class="agenda-tag-badge">Thema-avond</span>
+      </div>
+
+    </div>
+
+    <div class="reveal" style="margin-top:40px;text-align:center;">
+      <a href="#contact" class="btn btn-yellow">Schrijf je in voor een evenement</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ TESTIMONIALS ═══════════════════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <div class="reveal">
+      <span class="eyebrow">Wat leden zeggen</span>
+      <h2 style="color:#fff;">Verhalen uit de buurt</h2>
+      <p class="lead">Menselijke verhalen zijn de kern van onze coöperatie.</p>
+    </div>
+    <div class="testimonial-grid">
+      <div class="testimonial reveal">
+        <div class="t-quote">Het was een informatieve en inspirerende avond. Ik begreep voor het eerst echt hoe een energiecoöperatie werkt — en waarom we het nu moeten doen.</div>
+        <div class="t-author">
+          <div class="t-avatar">👨</div>
+          <div>
+            <div class="t-name">Lid ALV november 2025</div>
+            <div class="t-role">Uithoorn</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial reveal">
+        <div class="t-quote">Iedereen krijgt vroeg of laat te maken met de energietransitie. Fijn dat ECKU ons helpt om dit samen aan te pakken in de Legmeer.</div>
+        <div class="t-author">
+          <div class="t-avatar">👩</div>
+          <div>
+            <div class="t-name">Bewoner Legmeer</div>
+            <div class="t-role">De Kwakel</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial reveal">
+        <div class="t-quote">De samenwerking met gebiedscoöperatie Nieuwkoop liet zien dat het echt kan — lokaal, concreet en met enthousiasme.</div>
+        <div class="t-author">
+          <div class="t-avatar">🌿</div>
+          <div>
+            <div class="t-name">Jan Dirven</div>
+            <div class="t-role">Gebiedscoöperatie Nieuwkoop</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Photo strip -->
+    <div class="reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px;">
+      <div class="photo-box" style="height:180px;padding:0;overflow:hidden;">
+        <img src="images/Energiedag.png" alt="Energiedag" style="width:100%;height:100%;object-fit:cover;object-position:center;border-radius:inherit;" />
+      </div>
+      <div class="photo-box" style="height:180px;padding:0;overflow:hidden;">
+        <img src="images/BewonerDeKwakel.jpg" alt="Bewoner De Kwakel" style="width:100%;height:100%;object-fit:cover;object-position:center;border-radius:inherit;" />
+      </div>
+      <div class="photo-box" style="height:180px;padding:0;overflow:hidden;">
+        <img src="images/GebiedscoopNieuwkoop.jpg" alt="Gebiedscoöperatie Nieuwkoop" style="width:100%;height:100%;object-fit:cover;object-position:center;border-radius:inherit;" />
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ OVER ONS ═══════════════════════════════════════════════════ -->
+<section class="section bg-cream" id="over-ons">
+  <div class="container">
+    <div class="about-grid">
+
+      <div class="reveal-l">
+        <span class="eyebrow">Over ons</span>
+        <h2 style="color:#fff;">Waarom is ECKU opgericht?</h2>
+        <p style="font-size:16px;color:rgba(255,255,255,.85);margin-bottom:20px;">
+          Het plan voor Nederland is om in 2050 alleen maar duurzame energie te gebruiken. Dan willen we van het gas af zijn
+          en heel veel duurzame energie gaan opwekken.
+        </p>
+        <p style="font-size:16px;color:rgba(255,255,255,.85);margin-bottom:20px;">
+          In 2025 is de <strong>Energie Coöperatie De Kwakel en Uithoorn (ECKU)</strong> opgericht om aan dit doel een
+          positieve bijdrage te leveren met projecten in wijken, straten en huizen.
+        </p>
+        <p style="font-size:16px;color:rgba(255,255,255,.85);margin-bottom:32px;">
+          Wij geloven dat de energietransitie van onderaf moet komen — uit de buurt, door de buurt.
+          Hobbels, kuilen en drempels bespreken we samen om er een egale weg van te maken.
+        </p>
+        <div class="about-stats">
+          <div class="about-stat">
+            <div class="about-stat-num">Dec '25</div>
+            <div class="about-stat-lbl">Opgericht</div>
+          </div>
+          <div class="about-stat">
+            <div class="about-stat-num">€12/jr</div>
+            <div class="about-stat-lbl">Lidmaatschap</div>
+          </div>
+          <div class="about-stat">
+            <div class="about-stat-num">96661216</div>
+            <div class="about-stat-lbl">KVK-nummer</div>
+          </div>
+          <div class="about-stat">
+            <div class="about-stat-num">2050</div>
+            <div class="about-stat-lbl">Doeljaar</div>
+          </div>
+        </div>
+        <a href="#lid-worden" class="btn btn-green" style="margin-top:32px;">Word ook lid</a>
+      </div>
+
+      <div class="reveal-r">
+        <div class="photo-box about-photo" style="aspect-ratio:3/4;padding:0;overflow:hidden;">
+          <img src="images/BestuurECKUCanva.png" alt="Bestuur ECKU" style="width:100%;height:100%;object-fit:cover;object-position:top;border-radius:inherit;" />
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Team -->
+    <div class="reveal" style="margin-top:72px;">
+      <h3 style="font-size:28px;font-weight:800;margin-bottom:8px;color:#fff;">Ons bestuur</h3>
+      <p style="color:rgba(255,255,255,.8);margin-bottom:0;">De mensen achter ECKU — betrokken bewoners uit De Kwakel en Uithoorn.</p>
+    </div>
+    <div class="team-grid">
+      <div class="team-card reveal">
+        <div class="team-photo"><img src="images/Abram.png" alt="Abram Rutgers" /></div>
+        <div class="team-name">Abram Rutgers</div>
+        <div class="team-role">Voorzitter</div>
+      </div>
+      <div class="team-card reveal">
+        <div class="team-photo"><img src="images/Gert.png" alt="Gert de Vries" /></div>
+        <div class="team-name">Gert de Vries</div>
+        <div class="team-role">Secretaris</div>
+      </div>
+      <div class="team-card reveal">
+        <div class="team-photo"><img src="images/Richard.png" alt="Richard Dobber" /></div>
+        <div class="team-name">Richard Dobber</div>
+        <div class="team-role">Penningmeester</div>
+      </div>
+      <div class="team-card reveal">
+        <div class="team-photo"><img src="images/Rob.png" alt="Rob Kloppenburg" /></div>
+        <div class="team-name">Rob Kloppenburg</div>
+        <div class="team-role">Bestuurslid</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ ACTUEEL / NIEUWS ═══════════════════════════════════════════ -->
+<section class="section" id="actueel">
+  <div class="container">
+    <div class="reveal">
+      <span class="eyebrow">Actueel</span>
+      <h2 style="color:#fff;">Laatste nieuws</h2>
+      <p class="lead" style="color:rgba(255,255,255,.8);">Blijf op de hoogte van wat ECKU doet in De Kwakel en Uithoorn.</p>
+    </div>
+    <div class="nieuws-grid">
+
+      <div class="nieuws-card reveal">
+        <div class="nieuws-img">
+          <img src="images/Jan Dirven.png" alt="Jan Dirven" style="width:100%;height:100%;object-fit:cover;object-position:top;border-radius:inherit;" />
+        </div>
+        <div class="nieuws-body">
+          <div class="nieuws-date">13 november 2025</div>
+          <h3>Eerste ALV: inspirerende aftrap</h3>
+          <p>Op 13 november vond de eerste algemene ledenvergadering plaats. Jan Dirven van gebiedscoöperatie Nieuwkoop gaf een motiverende uiteenzetting over de energietransitie.</p>
+          <a href="#" class="nieuws-link">Lees meer</a>
+        </div>
+      </div>
+
+      <div class="nieuws-card reveal">
+        <div class="nieuws-img">
+          <img src="images/Legmeer.jpg" alt="Legmeer" style="width:100%;height:100%;object-fit:cover;object-position:center;border-radius:inherit;" />
+        </div>
+        <div class="nieuws-body">
+          <div class="nieuws-date">December 2025</div>
+          <h3>Legmeer als proefproject van start</h3>
+          <p>ECKU ondersteunt bewoners van de Legmeer bij de overgang van gas naar duurzame warmteoplossingen. Gezamenlijk aanpakken is de sleutel.</p>
+          <a href="#" class="nieuws-link">Lees meer</a>
+        </div>
+      </div>
+
+      <div class="nieuws-card reveal">
+        <div class="nieuws-img">
+          <img src="images/Opleiding energiecoaches.jpg" alt="Opleiding energiecoaches" style="width:100%;height:100%;object-fit:cover;object-position:top;border-radius:inherit;" />
+        </div>
+        <div class="nieuws-body">
+          <div class="nieuws-date">Januari 2026</div>
+          <h3>Energiecoaches in opleiding</h3>
+          <p>Vanaf januari 2026 starten de eerste energiecoaches met hun opleiding. Zij begeleiden bewoners persoonlijk bij het verduurzamen van hun woning.</p>
+          <a href="#" class="nieuws-link">Lees meer</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Nieuwsbrief CTA inline -->
+    <div class="reveal" style="margin-top:48px;background:var(--g-pale);border-radius:var(--radius);padding:36px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+      <div>
+        <h3 style="margin-bottom:6px;color:#000;">Mis niets — ontvang de nieuwsbrief</h3>
+        <p style="font-size:14px;color:var(--muted);">Praktische tips, projectupdates en uitnodigingen voor evenementen.</p>
+      </div>
+      <a href="#nieuwsbrief" class="btn btn-green">Aanmelden nieuwsbrief</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ NIEUWSBRIEF ════════════════════════════════════════════════ -->
+<section class="section bg-mid" id="nieuwsbrief">
+  <div class="container">
+    <div class="newsletter-wrap">
+
+      <div class="reveal-l">
+        <span class="eyebrow">Nieuwsbrief</span>
+        <h2>Blijf op de hoogte</h2>
+        <p class="lead">Schrijf je in en ontvang updates over ECKU, energietips en uitnodigingen voor evenementen.</p>
+        <div class="newsletter-benefits">
+          <div class="nl-benefit">
+            <div class="nl-benefit-icon">⚡</div>
+            Updates over lokale energieprojecten
+          </div>
+          <div class="nl-benefit">
+            <div class="nl-benefit-icon">💡</div>
+            Praktische tips om energie te besparen
+          </div>
+          <div class="nl-benefit">
+            <div class="nl-benefit-icon">📅</div>
+            Uitnodigingen voor evenementen &amp; thema-avonden
+          </div>
+          <div class="nl-benefit">
+            <div class="nl-benefit-icon">🤝</div>
+            Nieuws over het lidmaatschap en ECKU
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal-r">
+        <div class="newsletter-form">
+          <h3>Schrijf je in</h3>
+          <form onsubmit="handleNewsletter(event)">
+            <div class="form-group" style="margin-bottom:14px;">
+              <label style="color:rgba(255,255,255,.7);">Naam</label>
+              <input type="text" placeholder="Jouw naam" style="background:rgba(255,255,255,.1);color:white;border-color:rgba(255,255,255,.2);" />
+            </div>
+            <div class="form-group" style="margin-bottom:14px;">
+              <label style="color:rgba(255,255,255,.7);">E-mailadres *</label>
+              <input type="email" placeholder="jouw@email.nl" required style="background:rgba(255,255,255,.1);color:white;border-color:rgba(255,255,255,.2);" />
+            </div>
+            <button type="submit" class="btn btn-yellow" style="width:100%;justify-content:center;margin-top:6px;">
+              Aanmelden voor nieuwsbrief
+            </button>
+            <p style="font-size:12px;color:rgba(255,255,255,.45);margin-top:12px;">Je kunt je altijd uitschrijven. Geen spam.</p>
+          </form>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Nieuwsbrief december 2025 -->
+    <div class="reveal" style="margin-top:48px;">
+      <h3 style="color:var(--white);margin-bottom:20px;">Laatste nieuwsbrief — december 2025</h3>
+      <a href="https://gusanotest.my.canva.site/ecku-nieuwsbrief-1" target="_blank" rel="noopener">
+        <img src="images/Nieuwsbrief 1.jpg" alt="ECKU Nieuwsbrief december 2025"
+             style="width:100%;border-radius:var(--radius);box-shadow:var(--shadow-lg);
+                    transition:transform .2s;display:block;"
+             onmouseover="this.style.transform='scale(1.01)'"
+             onmouseout="this.style.transform='scale(1)'" />
+      </a>
+      <p style="font-size:13px;color:rgba(255,255,255,.5);margin-top:10px;text-align:center;">
+        Klik op de afbeelding om de volledige nieuwsbrief te bekijken
+      </p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══ PODCAST ════════════════════════════════════════════════════ -->
+<section class="section bg-cream" id="podcast">
+  <div class="container">
+
+    <!-- Intro -->
+    <div class="podcast-intro reveal">
+      <span class="eyebrow">Podcast Talkshow</span>
+      <h2 style="color:#fff;">De ECKU Podcast</h2>
+      <p class="lead" style="margin:0;white-space:nowrap;">Presentatoren <strong>Aart</strong> en <strong>Heleen</strong> praten over de energietransitie in Uithoorn &amp; De Kwakel. Beschikbaar in het Nederlands én Engels.</p>
+    </div>
+
+    <!-- Twee kaarten -->
+    <div class="podcast-cards">
+
+      <!-- ─── KAART 1: NEDERLANDS ─── -->
+      <div class="pod-card reveal-l">
+
+        <!-- Poster -->
+        <div class="pod-poster">
+          <!-- Vervang src door het werkelijke bestandspad als je de afbeelding toevoegt -->
+          <img src="images/podcast-nl.jpg" alt="ECKU Podcast Nederlands"
+               onerror="this.style.display='none'">
+          <!-- CSS-fallback poster (automatisch verborgen als img laadt) -->
+          <div class="pod-poster-fallback">
+            <span class="pod-flag">🇳🇱</span>
+            <div class="pod-mic">🎙️</div>
+            <div class="pod-label-podcast">PODCAST</div>
+            <div class="pod-label-talkshow">TALKSHOW</div>
+            <div class="pod-episode-banner">EPISODE 1</div>
+            <div class="pod-ecku-text">ECKU</div>
+            <div class="pod-tagline">"Ontdek de Kracht Achter<br>Energiecoöperaties!"</div>
+            <div class="pod-hosts">
+              <div class="pod-host">
+                <div class="pod-host-avatar">👨</div>
+                <span class="pod-host-name">Aart</span>
+              </div>
+              <div class="pod-host">
+                <div class="pod-host-avatar">👩</div>
+                <span class="pod-host-name">Heleen</span>
+              </div>
+            </div>
+          </div>
+          <div class="pod-footer-bar">meer informatie: www.ecku.nl</div>
+        </div>
+
+        <!-- Info -->
+        <div class="pod-info">
+          <span class="pod-lang-badge">🇳🇱 Nederlands</span>
+          <div class="pod-title">Ontdek de Kracht Achter Energiecoöperaties!</div>
+          <p class="pod-desc">
+            Aart en Heleen bespreken hoe buurtbewoners in Uithoorn &amp; De Kwakel samen de
+            energietransitie aanpakken. Lokaal, praktisch en inspirerend.
+          </p>
+          <!-- Aflevering 1 -->
+          <a href="https://gusanotest.my.canva.site/podcast-ecku-nederlands" target="_blank" class="pod-ep-row">
+            <div class="pod-ep-play">▶</div>
+            <div class="pod-ep-meta">
+              <div class="pod-ep-num">Aflevering 1</div>
+              <div class="pod-ep-name">Energiecoöperatie De Kwakel Uithoorn</div>
+              <div class="pod-ep-dur">⏱ ~7 min · 2025</div>
+            </div>
+            <span class="pod-new-badge">Nieuw</span>
+          </a>
+          <a href="https://gusanotest.my.canva.site/podcast-ecku-nederlands" target="_blank" class="pod-btn">
+            🎧 Bekijk &amp; beluister (Nederlands)
+          </a>
+        </div>
+
+      </div><!-- /kaart NL -->
+
+
+      <!-- ─── KAART 2: ENGLISH ─── -->
+      <div class="pod-card reveal-r">
+
+        <!-- Poster -->
+        <div class="pod-poster">
+          <img src="images/podcast-en.jpg" alt="ECKU Podcast English"
+               onerror="this.style.display='none'">
+          <div class="pod-poster-fallback">
+            <span class="pod-flag">🇬🇧</span>
+            <div class="pod-mic">🎙️</div>
+            <div class="pod-label-podcast">PODCAST</div>
+            <div class="pod-label-talkshow">TALKSHOW</div>
+            <div class="pod-episode-banner">EPISODE 1</div>
+            <div class="pod-ecku-text">ECKU</div>
+            <div class="pod-tagline">"Discover The Power Behind<br>Energy Cooperatives!"</div>
+            <div class="pod-hosts">
+              <div class="pod-host">
+                <div class="pod-host-avatar">👨</div>
+                <span class="pod-host-name">Aart</span>
+              </div>
+              <div class="pod-host">
+                <div class="pod-host-avatar">👩</div>
+                <span class="pod-host-name">Heleen</span>
+              </div>
+            </div>
+          </div>
+          <div class="pod-footer-bar">more information: www.ecku.nl</div>
+        </div>
+
+        <!-- Info -->
+        <div class="pod-info">
+          <span class="pod-lang-badge">🇬🇧 English</span>
+          <div class="pod-title">Discover The Power Behind Energy Cooperatives!</div>
+          <p class="pod-desc">
+            Aart and Heleen discuss how local residents in Uithoorn &amp; De Kwakel are taking
+            the energy transition into their own hands. Practical, local and inspiring.
+          </p>
+          <!-- Episode 1 -->
+          <a href="https://gusanotest.my.canva.site/dahfemxdcs0" target="_blank" class="pod-ep-row">
+            <div class="pod-ep-play">▶</div>
+            <div class="pod-ep-meta">
+              <div class="pod-ep-num">Episode 1</div>
+              <div class="pod-ep-name">Energy Cooperative De Kwakel Uithoorn</div>
+              <div class="pod-ep-dur">⏱ ~7 min · 2025</div>
+            </div>
+            <span class="pod-new-badge">New</span>
+          </a>
+          <a href="https://gusanotest.my.canva.site/dahfemxdcs0" target="_blank" class="pod-btn">
+            🎧 Watch &amp; listen (English)
+          </a>
+        </div>
+
+      </div><!-- /kaart EN -->
+
+    </div><!-- /podcast-cards -->
+  </div>
+</section>
+
+
+<!-- ══ AI ENERGIEADVISEUR ═════════════════════════════════════════ -->
+<section class="section" id="ai-adviseur">  <div class="container">
+
+    <div class="reveal" style="text-align:left;margin:0 0 48px 0;">
+      <span class="eyebrow">Nieuw · Gratis</span>
+      <h2 style="color:#fff;white-space:nowrap;">Persoonlijk energieadvies via AI</h2>
+      <p class="lead" style="white-space:nowrap;">Onze AI energieadviseur stelt een paar vragen over je woning en geeft een eerste, onafhankelijk advies zonder verkooppraatje.</p>
+    </div>
+
+    <!-- Twee kolommen: Micky links, chat rechts -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:stretch;">
+
+      <!-- Links: foto Micky — zelfde hoogte als chatvenster -->
+      <div class="reveal-l" style="display:flex;flex-direction:column;height:100%;">
+        <div class="photo-box" style="width:100%;flex:1;">
+          <img src="images/Micky.png" alt="Micky — ECKU AI Energieadviseur" style="object-fit:contain;background:#f0f9f0;" />
+        </div>
+      </div>
+
+      <!-- Rechts: chatvenster -->
+      <div class="reveal-r" style="display:flex;flex-direction:column;height:100%;">
+        <div id="chat-box" style="background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,.1);overflow:hidden;border:1px solid rgba(26,92,46,.12);flex:1;">
+
+          <!-- Chatbalk -->
+          <div style="background:var(--g-dark);padding:18px 24px;display:flex;align-items:center;gap:14px;">
+            <img src="images/Micky.png" alt="Micky" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--yellow);flex-shrink:0;" />
+            <div>
+              <div style="color:#fff;font-weight:700;font-size:16px;">Micky — ECKU Energieadviseur</div>
+              <div style="color:rgba(255,255,255,.6);font-size:12px;">Onafhankelijk · Gratis eerste advies</div>
+            </div>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+              <span style="width:8px;height:8px;border-radius:50%;background:#4caf50;display:inline-block;"></span>
+              <span style="color:rgba(255,255,255,.6);font-size:12px;">Online</span>
+            </div>
+          </div>
+
+          <!-- Berichten -->
+          <div id="chat-messages" style="height:380px;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px;background:#f9fafb;">
+            <div class="chat-msg-ai">
+              <div class="chat-bubble-ai">
+                👋 Welkom! Ik ben Micky, de digitale energieadviseur van ECKU.<br><br>
+                Ik help je graag met een eerste, onafhankelijke inschatting van wat jij kunt doen om energie te besparen en je woning te verduurzamen.<br><br>
+                <em>Dit is een eerste oriëntatie — geen officiële energiescan.</em><br><br>
+                Laten we beginnen! 🌿 <strong>Gaat het om een woning of een bedrijfspand?</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Invoer -->
+          <div style="padding:16px 20px;background:#fff;border-top:1px solid #eee;display:flex;gap:10px;">
+            <input id="chat-input" type="text" placeholder="Typ hier je antwoord..."
+              style="flex:1;padding:12px 16px;border:1.5px solid #ddd;border-radius:50px;font-size:15px;outline:none;font-family:inherit;transition:border-color .2s;"
+              onkeydown="if(event.key==='Enter')sendChatMessage()"
+              onfocus="this.style.borderColor='var(--g-mid)'"
+              onblur="this.style.borderColor='#ddd'" />
+            <button onclick="sendChatMessage()" style="background:var(--g-dark);color:var(--yellow);border:none;border-radius:50px;padding:12px 22px;font-size:15px;font-weight:700;cursor:pointer;flex-shrink:0;"
+              onmouseover="this.style.background='var(--g-mid)'" onmouseout="this.style.background='var(--g-dark)'">
+              Stuur ➤
+            </button>
+          </div>
+
+        </div>
+        <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px;">
+          De resultaten van deze berekening zijn uitsluitend indicatief. Aan de uitkomsten kunnen geen rechten worden ontleend.
+        </p>
+      </div>
+
+    </div>
+    <p style="font-size:12px;color:rgba(255,255,255,.6);margin-top:20px;">De resultaten van deze berekening zijn uitsluitend indicatief. Aan de uitkomsten kunnen geen rechten worden ontleend.</p>
+  </div>
+</section>
+
+<style>
+  .chat-msg-ai { display:flex; justify-content:flex-start; }
+  .chat-bubble-ai { max-width:85%;padding:14px 18px;border-radius:18px;border-bottom-left-radius:4px;font-size:14px;line-height:1.6;background:#fff;border:1px solid #e5e7eb;color:var(--text); }
+  @media(max-width:768px){
+    #ai-adviseur .reveal-l { display:none; }
+    #ai-adviseur > .container > div[style*="grid"] { grid-template-columns:1fr !important; }
+  }
+</style>
+
+
+<!-- ══ CTA BANNER ════════════════════════════════════════════════ -->
+<div class="cta-banner">
+  <div class="container reveal">
+    <h2>Doe mee met de energie van morgen</h2>
+    <p style="white-space:nowrap;">Samen maken we De Kwakel en Uithoorn duurzamer. Elke bijdrage telt.</p>
+    <div class="cta-banner-btns">
+      <a href="#lid-worden" class="btn btn-yellow">⚡ Word lid — €12/jaar</a>
+      <a href="#contact"    class="btn btn-outline-w">Neem contact op</a>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+  const chatState = {
+    messages: [],
+    isTyping: false
+  };
+
+  async function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text || chatState.isTyping) return;
+    input.value = '';
+
+    // Voeg gebruikersbericht toe
+    appendMessage('user', text);
+    chatState.messages.push({ role: 'user', content: text });
+
+    // Toon typende indicator
+    chatState.isTyping = true;
+    const typingEl = appendTyping();
+
+    try {
+      const response = await fetch('http://localhost:3001/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: chatState.messages })
+      });
+
+      typingEl.remove();
+      const msgEl = appendMessage('bot', '');
+      const bubble = msgEl.querySelector('.bot-bubble');
+      let fullText = '';
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const raw = line.slice(6).trim();
+            if (raw === '[DONE]') break;
+            try {
+              const parsed = JSON.parse(raw);
+              if (parsed.text) {
+                fullText += parsed.text;
+                bubble.innerHTML = fullText.replace(/\n/g, '<br>');
+                document.getElementById('chat-messages').scrollTop = 999999;
+              }
+            } catch(e) {}
+          }
+        }
+      }
+      chatState.messages.push({ role: 'assistant', content: fullText });
+    } catch(e) {
+      typingEl.remove();
+      appendMessage('bot', 'Verbindingsfout. Zorg dat de server actief is (node server.js).');
+    }
+    chatState.isTyping = false;
+  }
+
+  function appendMessage(role, text) {
+    const div = document.createElement('div');
+    div.className = 'chat-msg ' + role;
+    div.innerHTML = `<div class="chat-bubble ${role}-bubble">${text.replace(/\n/g,'<br>')}</div>`;
+    const msgs = document.getElementById('chat-messages');
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    return div;
+  }
+
+  function appendTyping() {
+    const div = document.createElement('div');
+    div.className = 'chat-msg bot';
+    div.innerHTML = '<div class="typing-bubble"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>';
+    const msgs = document.getElementById('chat-messages');
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    return div;
+  }
+</script>
+
+
+<!-- ══ CONTACT ════════════════════════════════════════════════════ -->
+<section class="section" id="contact">
+  <div class="container">
+    <div class="reveal" style="margin:0 0 48px 0;">
+      <span class="eyebrow">Contact</span>
+      <h2 style="color:#fff;white-space:nowrap;">Neem contact met ons op</h2>
+      <p class="lead" style="margin:0;color:rgba(255,255,255,.8);">Vragen, ideeën of gewoon kennismaken? Wij horen graag van je.</p>
+    </div>
+    <div class="contact-grid">
+
+      <!-- Info -->
+      <div class="reveal-l">
+        <div class="contact-info">
+          <div class="contact-item">
+            <div class="contact-icon">✉️</div>
+            <div>
+              <h4>E-mail</h4>
+              <p><a href="mailto:info@ecku.nl">info@ecku.nl</a></p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">🌐</div>
+            <div>
+              <h4>Website</h4>
+              <p><a href="http://www.ecku.nl" target="_blank">www.ecku.nl</a></p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">🏢</div>
+            <div>
+              <h4>KVK-nummer</h4>
+              <p>96661216</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">📍</div>
+            <div>
+              <h4>Werkgebied</h4>
+              <p>De Kwakel &amp; Uithoorn, Noord-Holland</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-map">
+          <div id="ecku-map"></div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="reveal-r">
+        <form class="lid-form" onsubmit="handleContact(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Voornaam *</label>
+              <input type="text" placeholder="Jan" required />
+            </div>
+            <div class="form-group">
+              <label>Achternaam *</label>
+              <input type="text" placeholder="Jansen" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>E-mailadres *</label>
+            <input type="email" placeholder="jan@voorbeeld.nl" required />
+          </div>
+          <div class="form-group">
+            <label>Onderwerp *</label>
+            <select required>
+              <option value="">Kies een onderwerp</option>
+              <option>Lid worden</option>
+              <option>Energiecoach aanvragen</option>
+              <option>Vrijwilliger worden</option>
+              <option>Vraag over project Legmeer</option>
+              <option>Vraag over evenementen</option>
+              <option>Samenwerking</option>
+              <option>Overig</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Bericht *</label>
+            <textarea rows="5" placeholder="Schrijf hier je bericht..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-green">Verstuur bericht ⚡</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ FOOTER ═════════════════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo-area">
+          <img src="logo.jpg" alt="ECKU Logo" class="footer-logo-img" />
+          <div class="footer-logo-text">EC<span>KU</span></div>
+        </div>
+        <p>Energie Coöperatie De Kwakel en Uithoorn.<br>
+        Samen werken aan duurzame watts — voor en door bewoners.<br>
+        KVK: 96661216 · <a href="mailto:info@ecku.nl" style="color:var(--yellow);">info@ecku.nl</a></p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigatie</h4>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#actueel">Actueel</a></li>
+          <li><a href="#energie-besparen">Energie besparen</a></li>
+          <li><a href="#projecten">Projecten</a></li>
+          <li><a href="#agenda">Agenda</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Meedoen</h4>
+        <ul>
+          <li><a href="#lid-worden">Word lid — €12/jr</a></li>
+          <li><a href="#lid-worden">Energiecoach worden</a></li>
+          <li><a href="#lid-worden">Vrijwilliger worden</a></li>
+          <li><a href="#nieuwsbrief">Nieuwsbrief</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Info</h4>
+        <ul>
+          <li><a href="#over-ons">Over ons</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><a href="mailto:info@ecku.nl">info@ecku.nl</a></li>
+          <li><a href="http://www.ecku.nl" target="_blank">www.ecku.nl</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 ECKU – Energie Coöperatie De Kwakel en Uithoorn</span>
+      <span>KVK 96661216 · Opgericht december 2025</span>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ══ SCRIPTS ════════════════════════════════════════════════════ -->
+<script>
+  /* -- Scroll reveal -- */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.10 });
+  document.querySelectorAll('.reveal, .reveal-l, .reveal-r').forEach(el => observer.observe(el));
+
+  /* -- Nav scroll shadow + active link -- */
+  const nav = document.getElementById('site-header');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 20);
+    // Update active nav link
+    const sections = document.querySelectorAll('section[id], div[id="lid-worden"]');
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 100) current = s.id;
+    });
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  });
+
+  /* -- Mobile menu -- */
+  function toggleMenu() {
+    document.getElementById('mobile-menu').classList.toggle('open');
+  }
+  function closeMenu() {
+    document.getElementById('mobile-menu').classList.remove('open');
+  }
+
+  /* -- Form handlers -- */
+  function handleLidForm(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type=submit]');
+    btn.textContent = '✓ Aanmelding verstuurd!';
+    btn.style.background = '#2eaa5f';
+    btn.disabled = true;
+    setTimeout(() => { btn.textContent = 'Aanmelden als lid ⚡'; btn.style.background = ''; btn.disabled = false; e.target.reset(); }, 4000);
+  }
+  function handleNewsletter(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type=submit]');
+    btn.textContent = '✓ Ingeschreven!';
+    btn.disabled = true;
+    setTimeout(() => { btn.textContent = 'Aanmelden voor nieuwsbrief'; btn.disabled = false; e.target.reset(); }, 4000);
+  }
+  function handleContact(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type=submit]');
+    btn.textContent = '✓ Bericht verstuurd!';
+    btn.disabled = true;
+    setTimeout(() => { btn.textContent = 'Verstuur bericht ⚡'; btn.disabled = false; e.target.reset(); }, 4000);
+  }
+</script>
+
+<!-- ══ CHAT STIJL + LOGICA ══════════════════════════════════════ -->
+<style>
+  .chat-msg-ai  { display:flex; justify-content:flex-start; }
+  .chat-msg-user{ display:flex; justify-content:flex-end; }
+  .chat-bubble-ai {
+    background:#fff; color:#1a2e1a;
+    border:1px solid #e0e0e0;
+    border-radius:18px 18px 18px 4px;
+    padding:14px 18px; font-size:15px; line-height:1.6;
+    max-width:85%; box-shadow:0 2px 8px rgba(0,0,0,.06);
+  }
+  .chat-bubble-user {
+    background:var(--g-dark); color:#fff;
+    border-radius:18px 18px 4px 18px;
+    padding:14px 18px; font-size:15px; line-height:1.6;
+    max-width:85%;
+  }
+  .chat-typing {
+    display:flex; gap:5px; align-items:center; padding:6px 0;
+  }
+  .chat-typing span {
+    width:8px; height:8px; border-radius:50%;
+    background:var(--g-mid); display:inline-block;
+    animation:bounce .9s infinite;
+  }
+  .chat-typing span:nth-child(2){ animation-delay:.15s; }
+  .chat-typing span:nth-child(3){ animation-delay:.30s; }
+  @keyframes bounce {
+    0%,60%,100%{ transform:translateY(0); }
+    30%{ transform:translateY(-6px); }
+  }
+</style>
+
+<script>
+  // ── Chat state ──────────────────────────────────────────────
+  const chatHistory = [];   // { role: 'user'|'assistant', content: string }
+
+  function appendMessage(role, html) {
+    const wrap = document.getElementById('chat-messages');
+    const div  = document.createElement('div');
+    div.className = role === 'user' ? 'chat-msg-user' : 'chat-msg-ai';
+    const bubble = document.createElement('div');
+    bubble.className = role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai';
+    bubble.innerHTML = html;
+    div.appendChild(bubble);
+    wrap.appendChild(div);
+    wrap.scrollTop = wrap.scrollHeight;
+    return bubble;
+  }
+
+  function showTyping() {
+    const wrap = document.getElementById('chat-messages');
+    const div  = document.createElement('div');
+    div.id = 'chat-typing-indicator';
+    div.className = 'chat-msg-ai';
+    div.innerHTML = `<div class="chat-bubble-ai"><div class="chat-typing"><span></span><span></span><span></span></div></div>`;
+    wrap.appendChild(div);
+    wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  function removeTyping() {
+    const el = document.getElementById('chat-typing-indicator');
+    if (el) el.remove();
+  }
+
+  function escapeHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+            .replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  }
+
+  async function sendChatMessage() {
+    const input = document.getElementById('chat-input');
+    const text  = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    input.disabled = true;
+
+    appendMessage('user', escapeHtml(text));
+    chatHistory.push({ role: 'user', content: text });
+
+    showTyping();
+
+    try {
+      const res = await fetch('http://localhost:3001/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: chatHistory })
+      });
+
+      removeTyping();
+
+      if (!res.ok) throw new Error('Serverfout');
+
+      const bubble = appendMessage('assistant', '');
+      let fullText = '';
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const data = line.slice(6).trim();
+          if (data === '[DONE]') break;
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.text) {
+              fullText += parsed.text;
+              bubble.innerHTML = escapeHtml(fullText);
+              document.getElementById('chat-messages').scrollTop = 99999;
+            }
+            if (parsed.error) {
+              bubble.innerHTML = `<span style="color:#c00;">${parsed.error}</span>`;
+            }
+          } catch {}
+        }
+      }
+
+      chatHistory.push({ role: 'assistant', content: fullText });
+
+    } catch (err) {
+      removeTyping();
+      appendMessage('assistant', '<span style="color:#c00;">Er ging iets mis. Controleer de verbinding en probeer het opnieuw.</span>');
+      console.error(err);
+    }
+
+    input.disabled = false;
+    input.focus();
+  }
+</script>
+
+<script>
+  // Interactieve kaart — Leaflet + OpenStreetMap (gratis, geen API-sleutel nodig)
+  (function initMap() {
+    const mapEl = document.getElementById('ecku-map');
+    if (!mapEl) return;
+
+    // Coördinaten Uithoorn centrum
+    const uithoorn  = [52.2370, 4.8328];
+    const deKwakel  = [52.2355, 4.7940];
+    const center    = [52.230, 4.823];
+
+    const map = L.map('ecku-map', { scrollWheelZoom: false }).setView(center, 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
+      maxZoom: 18
+    }).addTo(map);
+
+    // Groen ECKU-icoon
+    const eckuIcon = L.divIcon({
+      html: `<div style="background:#1a5c2e;color:#e8f045;border-radius:50%;width:36px;height:36px;
+                         display:flex;align-items:center;justify-content:center;font-size:18px;
+                         border:3px solid #e8f045;box-shadow:0 2px 8px rgba(0,0,0,.3);">⚡</div>`,
+      iconSize: [36, 36], iconAnchor: [18, 18], popupAnchor: [0, -20], className: ''
+    });
+
+    L.marker(uithoorn, { icon: eckuIcon })
+      .addTo(map)
+      .bindPopup('<strong>ECKU – Uithoorn</strong><br>Energiecoöperatie De Kwakel & Uithoorn<br><a href="mailto:info@ecku.nl">info@ecku.nl</a>');
+
+    L.marker(deKwakel, { icon: eckuIcon })
+      .addTo(map)
+      .bindPopup('<strong>ECKU – De Kwakel</strong><br>Energiecoöperatie De Kwakel & Uithoorn');
+
+    // Tik scroll-zoom aan als de gebruiker op de kaart klikt
+    map.once('click', () => map.scrollWheelZoom.enable());
+  })();
+</script>
+
+<script>
+  // Micky foto exact even hoog als chatvenster
+  function matchMickyHeight() {
+    const chat = document.getElementById('chat-box');
+    const micky = document.querySelector('#ai-adviseur .photo-box');
+    if (chat && micky) {
+      micky.style.flex = 'none';
+      micky.style.minHeight = 'unset';
+      micky.style.height = chat.offsetHeight + 'px';
+    }
+  }
+  window.addEventListener('load', matchMickyHeight);
+  window.addEventListener('resize', matchMickyHeight);
+  setTimeout(matchMickyHeight, 300);
+</script>
+
+</body>
+</html>
