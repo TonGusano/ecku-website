@@ -118,9 +118,22 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
+app.get('/health', (req, res) => {
+  const key = process.env.ANTHROPIC_API_KEY;
+  res.json({
+    status: 'ok',
+    api_key_set: !!key,
+    api_key_length: key ? key.length : 0,
+    api_key_start: key ? key.substring(0, 10) : 'niet ingesteld'
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`✅ ECKU website draait op http://localhost:${PORT}`);
-  if (!process.env.ANTHROPIC_API_KEY) {
+  const key = process.env.ANTHROPIC_API_KEY;
+  if (!key) {
     console.warn('⚠️  ANTHROPIC_API_KEY is niet ingesteld — de AI-adviseur werkt niet zonder API-sleutel.');
+  } else {
+    console.log(`✅ API sleutel gevonden: ${key.length} tekens, begint met ${key.substring(0, 10)}`);
   }
 });
