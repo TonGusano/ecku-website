@@ -2315,7 +2315,7 @@
     const typingEl = appendTyping();
 
     try {
-      const response = await fetch('https://ecku-website-production.up.railway.app/api/chat', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: chatState.messages })
