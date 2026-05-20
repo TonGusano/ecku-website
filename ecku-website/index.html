@@ -151,17 +151,18 @@
       background: var(--g-dark);
     }
 
-    /* Mobiel: volle breedte, geen zijpadding, minimale hoogte */
+    /* Desktop: toon desktop header, verberg mobiel */
+    .header-mobiel { display: none; }
+    .header-desktop { display: block; }
+
+    /* Mobiel: toon mobiele header, verberg desktop */
     @media (max-width: 768px) {
       .header-banner {
         max-width: 100%;
         padding: 0;
       }
-      .header-banner-img {
-        min-height: 130px;
-        object-fit: cover;
-        object-position: left center;
-      }
+      .header-desktop { display: none; }
+      .header-mobiel { display: block; }
     }
 
     /* ── Nav bar ── */
@@ -894,9 +895,14 @@
   <!-- Donkergroene achtergrond over volle breedte, header-afbeelding gecentreerd -->
   <div class="header-bg">
     <a href="#home" class="header-banner">
+      <!-- Desktop header (verborgen op mobiel) -->
       <img src="images/HeaderECKUnieuw.png"
            alt="ECKU – Energiecoöperatie Uithoorn & De Kwakel"
-           class="header-banner-img" />
+           class="header-banner-img header-desktop" />
+      <!-- Mobiele header (verborgen op desktop) -->
+      <img src="images/MobielHeaderECKU.png"
+           alt="ECKU – Energiecoöperatie Uithoorn & De Kwakel"
+           class="header-banner-img header-mobiel" />
     </a>
   </div>
 
