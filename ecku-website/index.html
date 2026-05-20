@@ -2664,10 +2664,11 @@
     showTyping();
 
     try {
-      const res = await fetch('https://ecku-website-production.up.railway.app/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: chatHistory })
+      const res = await fetch('/api/chat', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ messages: chatHistory })
+      
       });
 
       removeTyping();
