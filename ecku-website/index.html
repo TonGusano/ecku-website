@@ -151,11 +151,16 @@
       background: var(--g-dark);
     }
 
-    /* Mobiel: volle breedte, geen zijpadding */
+    /* Mobiel: volle breedte, geen zijpadding, minimale hoogte */
     @media (max-width: 768px) {
       .header-banner {
         max-width: 100%;
         padding: 0;
+      }
+      .header-banner-img {
+        min-height: 130px;
+        object-fit: cover;
+        object-position: left center;
       }
     }
 
