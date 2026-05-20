@@ -867,6 +867,17 @@
     @media (max-width: 768px) {
       .lead, p, h2, h3 { white-space: normal !important; }
       .reveal-r { transform: none !important; }
+      /* Bespaarwidget: grids naar 1 kolom op mobiel */
+      #bespaarwidget .reveal > div[style*="grid-template-columns"],
+      #bespaarwidget div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+      }
+      /* Minder padding op mobiel */
+      #bespaarwidget div[style*="padding:40px 48px"] {
+        padding: 24px 20px !important;
+      }
+      /* Resultaten blok padding */
+      #bespaar-resultaat { padding: 20px 16px !important; }
     }
   </style>
 </head>
