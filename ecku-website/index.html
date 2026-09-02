@@ -8,6 +8,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Douche-bespaartool (hier.nu) -->
+  <link rel="stylesheet" href="https://www.hier.nu/libraries/externaltool/externaltool.css"/>
+  <script src="https://www.hier.nu/libraries/externaltool/externaltool.min.js"></script>
   <style>
     /* ── Reset ──────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -139,6 +142,7 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      width: 100%;
     }
     .header-banner-img {
       width: 100%;
@@ -164,6 +168,7 @@
       .header-desktop { display: none; }
       .header-mobiel { display: block; }
     }
+
 
     /* ── Nav bar ── */
     .nav-wrap {
@@ -1499,6 +1504,15 @@
 
     </div>
     <p style="font-size:12px;color:rgba(255,255,255,.6);margin-top:20px;">De resultaten van deze berekening zijn uitsluitend indicatief. Aan de uitkomsten kunnen geen rechten worden ontleend.</p>
+
+    <!-- ── Hier.nu verwijzing ──────────────────────────────────── -->
+    <div class="reveal" style="margin-top:28px;background:#fff;border-radius:var(--radius);padding:40px;box-shadow:0 8px 40px rgba(0,0,0,.15);text-align:center;">
+      <a href="https://www.hier.nu/energie-besparen" target="_blank" rel="noopener">
+        <img src="images/logoHIER.svg" alt="Hier.nu logo" style="max-width:220px;margin:0 auto 20px;" />
+      </a>
+      <p style="color:var(--muted);font-size:16px;">Klik op het Hier.nu logo om meer bespaartips te zien.</p>
+    </div>
+
   </div>
 </section>
 
