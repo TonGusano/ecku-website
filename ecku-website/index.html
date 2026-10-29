@@ -3173,7 +3173,7 @@
       canvas.setAttribute('role', 'img');
       canvas.setAttribute('aria-label', fallback ? fallback.alt : 'ECKU-logo');
       var ctx = canvas.getContext('2d');
-      var S, out, buf, n, idx, nx, nz, ny, shade, edge, latLine;
+      var S, out, buf, n, idx, nx, nz, ny, shade, edge;
 
       function opbouwen() {
         var css = box.getBoundingClientRect().width || 380;
@@ -3194,30 +3194,22 @@
           var spec = Math.pow(diff, 40) * 0.30;
           var lum = (0.62 + 0.48 * diff) * (0.86 + 0.14 * pz);
           var aa = Math.min(1, (1 - Math.sqrt(d2)) * R); // zachte rand
-          var lat = 0;
-          for (var k = -2; k <= 2; k++) { // breedtegraden
-            var dy = Math.abs(py - Math.sin(k * Math.PI / 6)) * R / Math.max(pz, 0.25);
-            if (dy < 1.2) lat = Math.max(lat, 1 - dy / 1.2);
-          }
-          list.push([y * S + x, px, py, pz, lum, spec, aa, lat]);
+          list.push([y * S + x, px, py, pz, lum, spec, aa]);
         }
         n = list.length;
         idx = new Int32Array(n); nx = new Float32Array(n); ny = new Float32Array(n); nz = new Float32Array(n);
-        shade = new Float32Array(n); edge = new Float32Array(n); latLine = new Float32Array(n);
+        shade = new Float32Array(n); edge = new Float32Array(n);
         var specArr = new Float32Array(n);
         list.forEach(function (p, i) {
           idx[i] = p[0]; nx[i] = p[1]; ny[i] = p[2]; nz[i] = p[3];
-          shade[i] = p[4]; specArr[i] = p[5]; edge[i] = p[6]; latLine[i] = p[7];
+          shade[i] = p[4]; specArr[i] = p[5]; edge[i] = p[6];
         });
         opbouwen.spec = specArr;
       }
 
-      var MER = [0, 1, 2, 3, 4, 5].map(function (k) { return k * Math.PI / 6; }); // lengtegraden
-      var MC = MER.map(Math.cos), MS = MER.map(Math.sin);
-
       function teken(hoek) {
         var cs = Math.cos(hoek), sn = Math.sin(hoek), half = T / 2, k = 0.985 * half;
-        var spec = opbouwen.spec, R = S / 2;
+        var spec = opbouwen.spec;
         buf.fill(0);
         for (var i = 0; i < n; i++) {
           var x = nx[i], z = nz[i];
@@ -3226,15 +3218,8 @@
           var u = (oz >= 0 ? ox : -ox) * k + half, v = oy * k + half;
           var t = tex[(v | 0) * T + (u | 0)];
           var r = t & 255, g = (t >> 8) & 255, b = (t >> 16) & 255;
-
-          // Lengte- en breedtegraden als dunne lichte lijntjes
-          var line = latLine[i];
-          for (var m = 0; m < 6; m++) {
-            var dd = Math.abs(ox * MC[m] - oz * MS[m]) * R / Math.max(z, 0.25);
-            if (dd < 1.2) { var w = 1 - dd / 1.2; if (w > line) line = w; }
-          }
-          var s = shade[i], sp = spec[i] * 255, ln = line * 0.16 * 255;
-          r = r * s + sp + ln; g = g * s + sp + ln; b = b * s + sp + ln;
+          var s = shade[i], sp = spec[i] * 255;
+          r = r * s + sp; g = g * s + sp; b = b * s + sp;
           if (r > 255) r = 255; if (g > 255) g = 255; if (b > 255) b = 255;
           buf[idx[i]] = ((edge[i] * 255) << 24) | (b << 16) | (g << 8) | r;
         }
