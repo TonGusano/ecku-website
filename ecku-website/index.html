@@ -440,6 +440,20 @@
     .hero-photo-badge span { display: block; font-size: 11px; font-weight: 500; opacity: .7; }
 
     /* ══════════════════════════════════════════════════════
+       ECKU WERELDBOL — draaiend logo (script onderaan de pagina)
+    ══════════════════════════════════════════════════════ */
+    .ecku-globe { --globe-size: 150px; position: relative; width: var(--globe-size); aspect-ratio: 1; }
+    .ecku-globe::before {
+      content: ""; position: absolute; inset: -9%; border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,240,69,.28) 52%, rgba(46,170,95,.18) 62%, transparent 71%);
+      filter: blur(6px);
+    }
+    .ecku-globe canvas, .ecku-globe img { position: relative; z-index: 1; width: 100%; height: 100%; display: block; border-radius: 50%; }
+    .hero-globe { position: absolute; top: -34px; right: -26px; z-index: 3; filter: drop-shadow(0 10px 18px rgba(0,0,0,.35)); }
+    .hero-globe-mobiel { display: none; --globe-size: 120px; margin: 0 0 22px; }
+    @media (max-width: 768px) { .hero-globe-mobiel { display: block; } }
+
+    /* ══════════════════════════════════════════════════════
        PILLARS (Wat is ECKU)
     ══════════════════════════════════════════════════════ */
     .pillars-grid {
@@ -921,6 +935,7 @@
         <li><a href="#subsidie-checker">Subsidies</a></li>
         <li><a href="#bespaarwidget">Bespaarwidget</a></li>
         <li><a href="#projecten">Projecten</a></li>
+        <li><a href="#voor-leden">Voor leden</a></li>
         <li><a href="#ai-adviseur">AI Adviseur</a></li>
         <li><a href="#podcast">Podcast</a></li>
         <li><a href="#over-ons">Over ons</a></li>
@@ -944,6 +959,7 @@
   <a href="#energie-besparen" onclick="closeMenu()">Energie besparen</a>
   <a href="#subsidie-checker" onclick="closeMenu()">Subsidies</a>
   <a href="#projecten"        onclick="closeMenu()">Projecten</a>
+  <a href="#voor-leden"       onclick="closeMenu()">Voor leden</a>
   <a href="#podcast"          onclick="closeMenu()">Podcast</a>
   <a href="#over-ons"         onclick="closeMenu()">Over ons</a>
   <a href="#nieuwsbrief"      onclick="closeMenu()">Nieuwsbrief</a>
@@ -960,6 +976,10 @@
 
       <!-- Text -->
       <div class="hero-content">
+        <!-- Draaiend ECKU-logo, alleen op telefoon (de foto rechts is daar verborgen) -->
+        <div class="ecku-globe hero-globe-mobiel" data-src="images/logo-ecku-rond.webp" data-seconds="14">
+          <img src="images/logo-ecku-rond.webp" alt="Logo ECKU, Energiecoöperatie De Kwakel Uithoorn" />
+        </div>
         <div class="hero-badge">⚡ Opgericht december 2025 · De Kwakel &amp; Uithoorn</div>
         <h1>Samen <em>duurzame energie</em> opwekken in onze regio</h1>
         <div class="hero-btns">
@@ -984,6 +1004,10 @@
 
       <!-- Photo area -->
       <div class="hero-photo">
+        <!-- Draaiend ECKU-logo (wereldbol) -->
+        <div class="ecku-globe hero-globe" data-src="images/logo-ecku-rond.webp" data-seconds="14">
+          <img src="images/logo-ecku-rond.webp" alt="Logo ECKU, Energiecoöperatie De Kwakel Uithoorn" />
+        </div>
         <div class="hero-photo-main">
           <img src="images/gezonde omgeving.jpeg" alt="Gezonde groene omgeving" style="width:100%;height:100%;object-fit:cover;border-radius:24px;" />
         </div>
@@ -1669,6 +1693,78 @@
 </section>
 
 
+<!-- ══ VOOR LEDEN ═════════════════════════════════════════════════ -->
+<!-- Openbare ledenpagina zonder inloggen: alleen totaalcijfers, geen persoonsgegevens. -->
+<section class="section" id="voor-leden">
+  <div class="container">
+    <div class="reveal">
+      <span class="eyebrow">Voor leden</span>
+      <h2 style="color:#fff;">Wat doet jouw coöperatie?</h2>
+      <p class="lead">Alles wat je als lid wilt weten op één plek: resultaten, besluiten en documenten.</p>
+    </div>
+
+    <div class="impact-bar reveal">
+      <div class="impact-cell">
+        <div class="impact-num">35</div>
+        <div class="impact-lbl">Leden</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-num">2025</div>
+        <div class="impact-lbl">Opgericht in december</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-num">2</div>
+        <div class="impact-lbl">Actieve projecten</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-num">€12</div>
+        <div class="impact-lbl">Lidmaatschap per jaar</div>
+      </div>
+    </div>
+
+    <div class="projects-grid">
+
+      <div class="project-card reveal">
+        <div class="project-body">
+          <span class="project-tag">Meebeslissen</span>
+          <h3>Lopende besluiten</h3>
+          <p>Op 28 oktober 2026 hielden we onze Algemene Ledenvergadering. Wil je weten wat er besloten is, of heb je een vraag of idee? Laat het ons weten.</p>
+          <div class="project-meta">📅 Laatste ALV: 28 oktober 2026</div>
+          <a href="mailto:info@ecku.nl?subject=Vraag%20over%20de%20ALV" class="btn btn-outline-g btn-sm" style="margin-top:16px;">Stel je vraag</a>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-body">
+          <span class="project-tag">Documenten</span>
+          <h3>Stukken &amp; verslagen</h3>
+          <p>Jaarverslag, financieel verslag, notulen van de ALV en de statuten. Liever op papier? Vraag het ons, dan sturen we het op.</p>
+          <div class="project-meta">📄 Laatst bijgewerkt: oktober 2026</div>
+          <!-- TODO: links naar PDF's in images/ of een aparte map docs/ -->
+          <a href="mailto:info@ecku.nl?subject=Documenten%20opvragen" class="btn btn-outline-g btn-sm" style="margin-top:16px;">Documenten opvragen</a>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-body">
+          <span class="project-tag">Nieuwsbrief</span>
+          <h3>Eerdere nieuwsbrieven</h3>
+          <p>Een nieuwsbrief gemist? Vraag hem bij ons op. Meld je aan, dan krijg je de volgende vanzelf in je mailbox.</p>
+          <div class="project-meta">✉️ 2 nieuwsbrieven verschenen</div>
+          <a href="#nieuwsbrief" class="btn btn-outline-g btn-sm" style="margin-top:16px;">Aanmelden nieuwsbrief</a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="reveal" style="margin-top:40px;text-align:center;">
+      <p style="margin-bottom:16px;">Wat zou jij als lid online willen zien of regelen? We horen het graag.</p>
+      <a href="mailto:info@ecku.nl?subject=Idee%20voor%20de%20ledenpagina" class="btn btn-yellow">💡 Deel je idee</a>
+    </div>
+  </div>
+</section>
+
+
 <!-- ══ LID WORDEN ═════════════════════════════════════════════════ -->
 <section class="section" id="lid-worden">
   <div class="container">
@@ -2035,6 +2131,232 @@
       </div>
 
     </div>
+
+    <!-- ── Nieuws uit de energiewereld: doorlopende slideshow ──
+         Een bericht toevoegen: kopieer één <article class="es-slide"> blok en pas de tekst aan.
+         De bolletjes onderaan worden automatisch gemaakt. -->
+    <div class="es-wrap reveal" id="energie-slider" aria-roledescription="carrousel" aria-label="Nieuws uit de energiewereld">
+      <div class="es-head">
+        <div>
+          <div class="es-kicker">Nieuws uit de energiewereld</div>
+          <h3 class="es-title">Wat speelt er in Nederland?</h3>
+        </div>
+        <div class="es-controls">
+          <button type="button" class="es-btn" data-es="prev" aria-label="Vorig bericht">&#8249;</button>
+          <button type="button" class="es-btn" data-es="pause" aria-label="Pauzeren"></button>
+          <button type="button" class="es-btn" data-es="next" aria-label="Volgend bericht">&#8250;</button>
+        </div>
+      </div>
+
+      <div class="es-track" aria-live="polite">
+
+        <article class="es-slide">
+          <div class="es-meta"><b class="es-tag">Energie delen</b> Energie Samen · 16 oktober 2026</div>
+          <h4>Straks stroom delen met de buren, ook bij een andere leverancier</h4>
+          <p>Door nieuwe Europese regels mogen buren straks zelf opgewekte stroom met elkaar delen, ook als ze bij verschillende energieleveranciers zitten. Nu kan dat alleen als iedereen bij dezelfde leverancier zit. Energie Samen wil dat de stroom wordt verdeeld naar wat mensen echt verbruiken.</p>
+          <a class="es-link" href="https://energiesamen.nu/nieuws/energiedelen-met-vrije-leverancierskeuze-position-paper/" target="_blank" rel="noopener">Lees verder bij Energie Samen &rarr;</a>
+        </article>
+
+        <article class="es-slide">
+          <div class="es-meta"><b class="es-tag">Coöperaties</b> HIER · Lokale Energie Monitor 2025</div>
+          <h4>696 energiecoöperaties met samen ruim 143.000 leden</h4>
+          <p>Het aantal leden groeide met 3,2%. Er zijn ruim 1.000 bewonersinitiatieven en meer dan 9.000 vrijwilligers actief. Warmteprojecten groeien hard, maar er komen minder nieuwe zonne- en windprojecten bij.</p>
+          <a class="es-link" href="https://www.hier.nu/lokale-energie-monitor-2025" target="_blank" rel="noopener">Lees verder bij HIER &rarr;</a>
+        </article>
+
+        <article class="es-slide">
+          <div class="es-meta"><b class="es-tag">Energietransitie</b> TNO / Energy.nl · 28 oktober 2026</div>
+          <h4>Landelijk waterstofnet wordt miljarden duurder</h4>
+          <p>Het nieuwe waterstofnet kost meer dan gedacht. Toch is het in de meeste scenario's binnen 25 jaar terugverdiend. Waterstof is vooral belangrijk voor de industrie.</p>
+          <a class="es-link" href="https://energy.nl/publications/scenarios-voor-gebruik-en-bekostiging-waterstofnet/" target="_blank" rel="noopener">Lees verder bij Energy.nl &rarr;</a>
+        </article>
+
+        <article class="es-slide">
+          <div class="es-meta"><b class="es-tag">Warmte</b> TNO · 23 oktober 2026</div>
+          <h4>Vijf toekomstbeelden voor hoe we in 2050 verwarmen</h4>
+          <p>TNO schetst vijf scenario's voor de warmtevoorziening in 2050. Ze helpen gemeenten en bewoners om keuzes te bespreken en dilemma's zichtbaar te maken.</p>
+          <a class="es-link" href="https://energy.nl/publications/kiezen-vanuit-waarden-in-de-warmtetransitie/" target="_blank" rel="noopener">Lees verder bij Energy.nl &rarr;</a>
+        </article>
+
+        <article class="es-slide">
+          <div class="es-meta"><b class="es-tag">Coöperaties</b> Energie Samen · 6 oktober 2026</div>
+          <h4>Energiecoöperaties: de motor voor verduurzaming van woonwijken</h4>
+          <p>Energie Samen vraagt de Tweede Kamer om lokale energiegemeenschappen een grotere rol te geven bij het verduurzamen van huizen en wijken.</p>
+          <a class="es-link" href="https://energiesamen.nu/nieuws/position-paper-energiegemeenschappen-de-motor-voor-verduurzaming-van-de-gebouwde-omgeving/" target="_blank" rel="noopener">Lees verder bij Energie Samen &rarr;</a>
+        </article>
+
+        <article class="es-slide">
+          <div class="es-meta"><b class="es-tag">In de regio</b> Energie Samen Noord-Holland</div>
+          <h4>Energiecoöperatie Elsrijk gaat van het gas af</h4>
+          <p>In Amstelveen is Energiecoöperatie Elsrijk officieel gestart. Bewoners werken samen aan aardgasvrij wonen met kleine, gezamenlijke warmtenetten.</p>
+          <a class="es-link" href="https://energiesamennoordholland.nl/energiecooperatie-elsrijk-officieel-van-start-samen-op-weg-naar-aardgasvrij-wonen-met-mini-warmtenetten/" target="_blank" rel="noopener">Lees verder bij ESNH &rarr;</a>
+        </article>
+
+        <article class="es-slide">
+          <div class="es-meta"><b class="es-tag">Energie delen</b> Energie Samen Noord-Holland</div>
+          <h4>Is energie delen dé oplossing?</h4>
+          <p>Voorbeelden uit de Achterhoek en Eemnes laten zien dat lokaal stroom delen een stabiele, eerlijke prijs kan opleveren. Geen wondermiddel, wel een concrete stap vooruit.</p>
+          <a class="es-link" href="https://energiesamennoordholland.nl/is-energiedelen-de-oplossing/" target="_blank" rel="noopener">Lees verder bij ESNH &rarr;</a>
+        </article>
+
+        <article class="es-slide">
+          <div class="es-meta"><b class="es-tag">Je portemonnee</b> TNO / Energy.nl · 15 september 2026</div>
+          <h4>Energierekening stijgt richting 2031</h4>
+          <p>Hogere kosten voor het stroomnet, een nieuwe CO₂-heffing en verplicht bijmengen van groen gas maken de energierekening de komende jaren duurder. Besparen loont dus extra.</p>
+          <a class="es-link" href="https://energy.nl/publications/hoe-ontwikkelt-de-energierekening-van-huishoudens-zich-tot-2031/" target="_blank" rel="noopener">Lees verder bij Energy.nl &rarr;</a>
+        </article>
+
+        <article class="es-slide">
+          <div class="es-meta"><b class="es-tag">Agenda</b> 2 t/m 8 november 2026</div>
+          <h4>Doe mee met de Klimaatweek</h4>
+          <p>Een week vol activiteiten in het hele land die laten zien wat lokale initiatieven samen bereiken. Kijk wat er bij jou in de buurt te doen is.</p>
+          <a class="es-link" href="https://klimaatweek.nl/agenda" target="_blank" rel="noopener">Bekijk de agenda &rarr;</a>
+        </article>
+
+      </div>
+
+      <div class="es-foot">
+        <div class="es-dots" role="tablist" aria-label="Kies een bericht"></div>
+        <div class="es-progress"><i></i></div>
+      </div>
+    </div>
+
+    <style>
+      .es-wrap { margin-top: 56px; background: var(--g-dark); border-radius: 22px; padding: 32px 36px 26px; box-shadow: var(--shadow-lg); border: 1px solid rgba(232,240,69,.25); }
+      .es-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 22px; }
+      .es-kicker { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--yellow); margin-bottom: 6px; }
+      .es-title { font-size: 24px; margin: 0; color: #fff; }
+      .es-controls { display: flex; gap: 8px; flex-shrink: 0; }
+      .es-btn { width: 42px; height: 42px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); background: transparent; color: #fff; font-size: 20px; line-height: 1; cursor: pointer; transition: background .18s, border-color .18s, color .18s; }
+      .es-btn[data-es="pause"] { display: inline-flex; align-items: center; justify-content: center; }
+      .es-btn svg { width: 14px; height: 14px; fill: currentColor; }
+      .es-btn:hover, .es-btn:focus-visible { background: var(--yellow); border-color: var(--yellow); color: var(--g-dark); outline: none; }
+
+      /* Alle slides in dezelfde rastercel: hoogte = langste bericht, dus niets springt */
+      .es-track { display: grid; }
+      .es-slide { grid-area: 1 / 1; opacity: 0; visibility: hidden; transform: translateX(24px); transition: opacity .6s ease, transform .6s ease, visibility .6s; background: linear-gradient(135deg, var(--g-mid) 0%, #145a30 100%); border-radius: var(--radius); padding: 30px 32px; border-left: 6px solid var(--yellow); }
+      .es-slide.is-active { opacity: 1; visibility: visible; transform: none; }
+      .es-meta { font-size: 13px; color: rgba(255,255,255,.75); margin-bottom: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+      .es-tag { background: var(--yellow); color: var(--g-dark); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; border-radius: 100px; padding: 4px 12px; }
+      .es-slide h4 { font-size: clamp(20px, 2.6vw, 28px); font-weight: 800; color: #fff; margin-bottom: 12px; line-height: 1.2; }
+      .es-slide p { font-size: 16px; color: rgba(255,255,255,.88); max-width: 760px; margin-bottom: 20px; }
+      .es-link { display: inline-block; font-weight: 700; font-size: 15px; color: var(--g-dark); background: var(--yellow); border-radius: 50px; padding: 10px 22px; transition: transform .18s, box-shadow .18s; }
+      .es-link:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+
+      .es-foot { display: flex; align-items: center; gap: 20px; margin-top: 20px; }
+      .es-dots { display: flex; gap: 8px; flex-wrap: wrap; }
+      .es-dot { width: 10px; height: 10px; border-radius: 50%; border: 0; padding: 0; background: rgba(255,255,255,.3); cursor: pointer; transition: background .2s, width .2s; }
+      .es-dot[aria-selected="true"] { background: var(--yellow); width: 26px; border-radius: 10px; }
+      .es-progress { flex: 1; height: 3px; background: rgba(255,255,255,.15); border-radius: 3px; overflow: hidden; }
+      .es-progress i { display: block; height: 100%; width: 0; background: var(--yellow); }
+
+      @media (max-width: 768px) {
+        .es-wrap { padding: 24px 18px 20px; border-radius: 18px; }
+        .es-head { flex-direction: column; align-items: flex-start; }
+        .es-title { font-size: 20px; }
+        .es-slide { padding: 22px 20px; }
+        .es-slide p { font-size: 15px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .es-slide { transition: opacity .2s; transform: none; }
+      }
+    </style>
+
+    <script>
+    (function () {
+      var root = document.getElementById('energie-slider');
+      if (!root) return;
+      var slides = root.querySelectorAll('.es-slide');
+      var dotsBox = root.querySelector('.es-dots');
+      var bar = root.querySelector('.es-progress i');
+      var pauseBtn = root.querySelector('[data-es="pause"]');
+      var DUUR = 8000; // milliseconden per bericht
+      var huidig = 0, timer = null, start = 0, resterend = DUUR;
+      var gepauzeerd = false, hover = false;
+      var weinigBeweging = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      slides.forEach(function (s, i) {
+        var d = document.createElement('button');
+        d.type = 'button';
+        d.className = 'es-dot';
+        d.setAttribute('role', 'tab');
+        d.setAttribute('aria-label', 'Bericht ' + (i + 1));
+        d.addEventListener('click', function () { toon(i, true); });
+        dotsBox.appendChild(d);
+      });
+      var dots = dotsBox.querySelectorAll('.es-dot');
+
+      function toon(i, handmatig) {
+        if (handmatig) stop();
+        huidig = (i + slides.length) % slides.length;
+        slides.forEach(function (s, n) {
+          s.classList.toggle('is-active', n === huidig);
+          s.setAttribute('aria-hidden', n === huidig ? 'false' : 'true');
+          s.querySelectorAll('a').forEach(function (a) { a.tabIndex = n === huidig ? 0 : -1; });
+        });
+        dots.forEach(function (d, n) { d.setAttribute('aria-selected', n === huidig ? 'true' : 'false'); });
+        resterend = DUUR;
+        bar.style.transition = 'none';
+        bar.style.width = '0';
+        if (handmatig) speel();
+      }
+
+      function loopt() { return !gepauzeerd && !hover; }
+
+      function speel() {
+        if (!loopt()) return;
+        start = Date.now();
+        bar.style.transition = 'none';
+        bar.style.width = ((DUUR - resterend) / DUUR * 100) + '%';
+        void bar.offsetWidth;
+        if (!weinigBeweging) {
+          bar.style.transition = 'width ' + resterend + 'ms linear';
+          bar.style.width = '100%';
+        }
+        timer = setTimeout(function () { resterend = DUUR; toon(huidig + 1); speel(); }, resterend);
+      }
+
+      function stop() {
+        if (timer) {
+          clearTimeout(timer); timer = null;
+          resterend = Math.max(0, resterend - (Date.now() - start));
+        }
+        var w = getComputedStyle(bar).width;
+        bar.style.transition = 'none';
+        bar.style.width = w;
+      }
+
+      root.querySelector('[data-es="prev"]').addEventListener('click', function () { toon(huidig - 1, true); });
+      root.querySelector('[data-es="next"]').addEventListener('click', function () { toon(huidig + 1, true); });
+      var ICOON_PAUZE = '<svg viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1" width="3.5" height="12" rx="1"/><rect x="8.5" y="1" width="3.5" height="12" rx="1"/></svg>';
+      var ICOON_SPEEL = '<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5v11l9.5-5.5z"/></svg>';
+      pauseBtn.innerHTML = ICOON_PAUZE;
+      pauseBtn.addEventListener('click', function () {
+        gepauzeerd = !gepauzeerd;
+        pauseBtn.innerHTML = gepauzeerd ? ICOON_SPEEL : ICOON_PAUZE;
+        pauseBtn.setAttribute('aria-label', gepauzeerd ? 'Afspelen' : 'Pauzeren');
+        gepauzeerd ? stop() : speel();
+      });
+
+      // Pauzeren zolang de muis erop staat of iemand met het toetsenbord in de slider zit
+      root.addEventListener('mouseenter', function () { hover = true; stop(); });
+      root.addEventListener('mouseleave', function () { hover = false; speel(); });
+      root.addEventListener('focusin', function (e) { if (e.target.matches(':focus-visible')) { hover = true; stop(); } });
+      root.addEventListener('focusout', function (e) { if (!root.contains(e.relatedTarget)) { hover = false; speel(); } });
+
+      // Vegen op telefoon
+      var x0 = null;
+      root.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+      root.addEventListener('touchend', function (e) {
+        if (x0 === null) return;
+        var dx = e.changedTouches[0].clientX - x0;
+        if (Math.abs(dx) > 40) toon(huidig + (dx < 0 ? 1 : -1), true);
+        x0 = null;
+      });
+
+      toon(0, true);
+    })();
+    </script>
 
     <!-- Nieuwsbrief CTA inline -->
     <div class="reveal" style="margin-top:48px;background:var(--g-pale);border-radius:var(--radius);padding:36px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
@@ -2540,6 +2862,7 @@
           <li><a href="#actueel">Actueel</a></li>
           <li><a href="#energie-besparen">Energie besparen</a></li>
           <li><a href="#projecten">Projecten</a></li>
+        <li><a href="#voor-leden">Voor leden</a></li>
           <li><a href="#agenda">Agenda</a></li>
         </ul>
       </div>
@@ -2825,5 +3148,127 @@
   setTimeout(matchMickyHeight, 300);
 </script>
 
+<!-- ══ ECKU WERELDBOL: logo als draaiende bol ══════════════════════ -->
+  <script>
+  (function () {
+    document.querySelectorAll('.ecku-globe').forEach(function (box) {
+      var fallback = box.querySelector('img');
+      var img = new Image();
+      img.onload = function () { start(box, img, fallback); };
+      img.src = box.dataset.src;
+    });
+
+    function start(box, img, fallback) {
+      var weinigBeweging = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var omloop = (parseFloat(box.dataset.seconds) || 14) * 1000; // ms per volledige draai
+
+      // Logo als "textuur" inlezen
+      var T = 768;
+      var tc = document.createElement('canvas'); tc.width = tc.height = T;
+      var tctx = tc.getContext('2d');
+      tctx.drawImage(img, 0, 0, T, T);
+      var tex = new Uint32Array(tctx.getImageData(0, 0, T, T).data.buffer);
+
+      var canvas = document.createElement('canvas');
+      canvas.setAttribute('role', 'img');
+      canvas.setAttribute('aria-label', fallback ? fallback.alt : 'ECKU-logo');
+      var ctx = canvas.getContext('2d');
+      var S, out, buf, n, idx, nx, nz, ny, shade, edge, latLine;
+
+      function opbouwen() {
+        var css = box.getBoundingClientRect().width || 380;
+        S = Math.min(720, Math.round(css * Math.min(window.devicePixelRatio || 1, 2)));
+        canvas.width = canvas.height = S;
+        out = ctx.createImageData(S, S);
+        buf = new Uint32Array(out.data.buffer);
+
+        // Vooraf per pixel uitrekenen wat niet verandert tijdens het draaien
+        var R = S / 2 - 1, c = S / 2, list = [];
+        var L = [-0.45, -0.55, 0.70], Ll = Math.hypot(L[0], L[1], L[2]);
+        L = L.map(function (v) { return v / Ll; });
+        for (var y = 0; y < S; y++) for (var x = 0; x < S; x++) {
+          var px = (x + 0.5 - c) / R, py = (y + 0.5 - c) / R, d2 = px * px + py * py;
+          if (d2 >= 1) continue;
+          var pz = Math.sqrt(1 - d2);
+          var diff = Math.max(0, px * L[0] + py * L[1] + pz * L[2]);
+          var spec = Math.pow(diff, 40) * 0.30;
+          var lum = (0.62 + 0.48 * diff) * (0.86 + 0.14 * pz);
+          var aa = Math.min(1, (1 - Math.sqrt(d2)) * R); // zachte rand
+          var lat = 0;
+          for (var k = -2; k <= 2; k++) { // breedtegraden
+            var dy = Math.abs(py - Math.sin(k * Math.PI / 6)) * R / Math.max(pz, 0.25);
+            if (dy < 1.2) lat = Math.max(lat, 1 - dy / 1.2);
+          }
+          list.push([y * S + x, px, py, pz, lum, spec, aa, lat]);
+        }
+        n = list.length;
+        idx = new Int32Array(n); nx = new Float32Array(n); ny = new Float32Array(n); nz = new Float32Array(n);
+        shade = new Float32Array(n); edge = new Float32Array(n); latLine = new Float32Array(n);
+        var specArr = new Float32Array(n);
+        list.forEach(function (p, i) {
+          idx[i] = p[0]; nx[i] = p[1]; ny[i] = p[2]; nz[i] = p[3];
+          shade[i] = p[4]; specArr[i] = p[5]; edge[i] = p[6]; latLine[i] = p[7];
+        });
+        opbouwen.spec = specArr;
+      }
+
+      var MER = [0, 1, 2, 3, 4, 5].map(function (k) { return k * Math.PI / 6; }); // lengtegraden
+      var MC = MER.map(Math.cos), MS = MER.map(Math.sin);
+
+      function teken(hoek) {
+        var cs = Math.cos(hoek), sn = Math.sin(hoek), half = T / 2, k = 0.985 * half;
+        var spec = opbouwen.spec, R = S / 2;
+        buf.fill(0);
+        for (var i = 0; i < n; i++) {
+          var x = nx[i], z = nz[i];
+          var ox = x * cs - z * sn, oz = x * sn + z * cs, oy = ny[i];
+          // Voorkant: logo; achterkant: logo gespiegeld zodat het weer leesbaar is als het rondkomt
+          var u = (oz >= 0 ? ox : -ox) * k + half, v = oy * k + half;
+          var t = tex[(v | 0) * T + (u | 0)];
+          var r = t & 255, g = (t >> 8) & 255, b = (t >> 16) & 255;
+
+          // Lengte- en breedtegraden als dunne lichte lijntjes
+          var line = latLine[i];
+          for (var m = 0; m < 6; m++) {
+            var dd = Math.abs(ox * MC[m] - oz * MS[m]) * R / Math.max(z, 0.25);
+            if (dd < 1.2) { var w = 1 - dd / 1.2; if (w > line) line = w; }
+          }
+          var s = shade[i], sp = spec[i] * 255, ln = line * 0.16 * 255;
+          r = r * s + sp + ln; g = g * s + sp + ln; b = b * s + sp + ln;
+          if (r > 255) r = 255; if (g > 255) g = 255; if (b > 255) b = 255;
+          buf[idx[i]] = ((edge[i] * 255) << 24) | (b << 16) | (g << 8) | r;
+        }
+        ctx.putImageData(out, 0, 0);
+      }
+
+      opbouwen();
+      if (fallback) fallback.remove();
+      box.appendChild(canvas);
+
+      // Bij "Beperk beweging" draait de bol extra rustig; met een klik zet je hem stil
+      if (weinigBeweging) omloop *= 1.6;
+
+      var hoek = 0, vorige = 0, frame = null, inBeeld = false, stil = false;
+      function loop(nu) {
+        hoek += ((nu - (vorige || nu)) / omloop) * Math.PI * 2;
+        vorige = nu;
+        teken(hoek);
+        frame = requestAnimationFrame(loop);
+      }
+      function bijwerken() {
+        var moet = inBeeld && !stil;
+        if (moet && !frame) { vorige = 0; frame = requestAnimationFrame(loop); }
+        if (!moet && frame) { cancelAnimationFrame(frame); frame = null; }
+      }
+      teken(0);
+      // Alleen draaien als de bol in beeld is (bespaart batterij)
+      new IntersectionObserver(function (e) { inBeeld = e[0].isIntersecting; bijwerken(); }).observe(box);
+      box.style.cursor = 'pointer';
+      box.title = 'Klik om te pauzeren of verder te draaien';
+      box.addEventListener('click', function () { stil = !stil; bijwerken(); });
+      window.addEventListener('resize', function () { opbouwen(); teken(hoek); });
+    }
+  })();
+  </script>
 </body>
 </html>

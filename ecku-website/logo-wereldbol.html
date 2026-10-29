@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECKU Wereldbol</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --g-dark:  #0c3d22;
+      --g-mid:   #1a6b3a;
+      --g-light: #2eaa5f;
+      --yellow:  #e8f045;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+      font-family: 'Inter', sans-serif; color: #fff; padding: 32px 16px;
+      background: linear-gradient(140deg, #0f3d1e 0%, #1a6b3a 55%, #2eaa5f 100%) fixed;
+    }
+    h1 { font-size: clamp(22px, 4vw, 34px); font-weight: 800; text-align: center; }
+    p  { color: rgba(255,255,255,.8); text-align: center; max-width: 520px; }
+
+    /* ── ECKU wereldbol ─────────────────────────────────
+       Overnemen op een andere pagina: kopieer de <div class="ecku-globe">,
+       dit CSS-blok en het <script> hieronder. Pas de maat aan met --globe-size. */
+    .ecku-globe {
+      --globe-size: min(78vw, 380px);
+      position: relative; width: var(--globe-size); aspect-ratio: 1;
+    }
+    .ecku-globe::before { /* zachte gloed rond de bol */
+      content: ""; position: absolute; inset: -9%; border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,240,69,.28) 52%, rgba(46,170,95,.18) 62%, transparent 71%);
+      filter: blur(6px);
+    }
+    .ecku-globe::after { /* schaduw op de grond */
+      content: ""; position: absolute; left: 18%; right: 18%; bottom: -10%; height: 7%;
+      border-radius: 50%; background: radial-gradient(ellipse, rgba(0,0,0,.35), transparent 70%);
+    }
+    .ecku-globe canvas, .ecku-globe img {
+      position: relative; z-index: 1; width: 100%; height: 100%; display: block; border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ecku-globe" data-src="images/logo-ecku-rond.webp" data-seconds="14">
+    <!-- Reserve: zonder JavaScript staat het logo gewoon stil -->
+    <img src="images/logo-ecku-rond.webp" alt="Logo ECKU, Energiecoöperatie De Kwakel Uithoorn" />
+  </div>
+
+  <h1>Samen naar een duurzame toekomst</h1>
+  <p>Energie Coöperatie De Kwakel &amp; Uithoorn</p>
+
+  <script>
+  (function () {
+    document.querySelectorAll('.ecku-globe').forEach(function (box) {
+      var fallback = box.querySelector('img');
+      var img = new Image();
+      img.onload = function () { start(box, img, fallback); };
+      img.src = box.dataset.src;
+    });
+
+    function start(box, img, fallback) {
+      var weinigBeweging = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var omloop = (parseFloat(box.dataset.seconds) || 14) * 1000; // ms per volledige draai
+
+      // Logo als "textuur" inlezen
+      var T = 768;
+      var tc = document.createElement('canvas'); tc.width = tc.height = T;
+      var tctx = tc.getContext('2d');
+      tctx.drawImage(img, 0, 0, T, T);
+      var tex = new Uint32Array(tctx.getImageData(0, 0, T, T).data.buffer);
+
+      var canvas = document.createElement('canvas');
+      canvas.setAttribute('role', 'img');
+      canvas.setAttribute('aria-label', fallback ? fallback.alt : 'ECKU-logo');
+      var ctx = canvas.getContext('2d');
+      var S, out, buf, n, idx, nx, nz, ny, shade, edge, latLine;
+
+      function opbouwen() {
+        var css = box.getBoundingClientRect().width || 380;
+        S = Math.min(720, Math.round(css * Math.min(window.devicePixelRatio || 1, 2)));
+        canvas.width = canvas.height = S;
+        out = ctx.createImageData(S, S);
+        buf = new Uint32Array(out.data.buffer);
+
+        // Vooraf per pixel uitrekenen wat niet verandert tijdens het draaien
+        var R = S / 2 - 1, c = S / 2, list = [];
+        var L = [-0.45, -0.55, 0.70], Ll = Math.hypot(L[0], L[1], L[2]);
+        L = L.map(function (v) { return v / Ll; });
+        for (var y = 0; y < S; y++) for (var x = 0; x < S; x++) {
+          var px = (x + 0.5 - c) / R, py = (y + 0.5 - c) / R, d2 = px * px + py * py;
+          if (d2 >= 1) continue;
+          var pz = Math.sqrt(1 - d2);
+          var diff = Math.max(0, px * L[0] + py * L[1] + pz * L[2]);
+          var spec = Math.pow(diff, 40) * 0.30;
+          var lum = (0.62 + 0.48 * diff) * (0.86 + 0.14 * pz);
+          var aa = Math.min(1, (1 - Math.sqrt(d2)) * R); // zachte rand
+          var lat = 0;
+          for (var k = -2; k <= 2; k++) { // breedtegraden
+            var dy = Math.abs(py - Math.sin(k * Math.PI / 6)) * R / Math.max(pz, 0.25);
+            if (dy < 1.2) lat = Math.max(lat, 1 - dy / 1.2);
+          }
+          list.push([y * S + x, px, py, pz, lum, spec, aa, lat]);
+        }
+        n = list.length;
+        idx = new Int32Array(n); nx = new Float32Array(n); ny = new Float32Array(n); nz = new Float32Array(n);
+        shade = new Float32Array(n); edge = new Float32Array(n); latLine = new Float32Array(n);
+        var specArr = new Float32Array(n);
+        list.forEach(function (p, i) {
+          idx[i] = p[0]; nx[i] = p[1]; ny[i] = p[2]; nz[i] = p[3];
+          shade[i] = p[4]; specArr[i] = p[5]; edge[i] = p[6]; latLine[i] = p[7];
+        });
+        opbouwen.spec = specArr;
+      }
+
+      var MER = [0, 1, 2, 3, 4, 5].map(function (k) { return k * Math.PI / 6; }); // lengtegraden
+      var MC = MER.map(Math.cos), MS = MER.map(Math.sin);
+
+      function teken(hoek) {
+        var cs = Math.cos(hoek), sn = Math.sin(hoek), half = T / 2, k = 0.985 * half;
+        var spec = opbouwen.spec, R = S / 2;
+        buf.fill(0);
+        for (var i = 0; i < n; i++) {
+          var x = nx[i], z = nz[i];
+          var ox = x * cs - z * sn, oz = x * sn + z * cs, oy = ny[i];
+          // Voorkant: logo; achterkant: logo gespiegeld zodat het weer leesbaar is als het rondkomt
+          var u = (oz >= 0 ? ox : -ox) * k + half, v = oy * k + half;
+          var t = tex[(v | 0) * T + (u | 0)];
+          var r = t & 255, g = (t >> 8) & 255, b = (t >> 16) & 255;
+
+          // Lengte- en breedtegraden als dunne lichte lijntjes
+          var line = latLine[i];
+          for (var m = 0; m < 6; m++) {
+            var dd = Math.abs(ox * MC[m] - oz * MS[m]) * R / Math.max(z, 0.25);
+            if (dd < 1.2) { var w = 1 - dd / 1.2; if (w > line) line = w; }
+          }
+          var s = shade[i], sp = spec[i] * 255, ln = line * 0.16 * 255;
+          r = r * s + sp + ln; g = g * s + sp + ln; b = b * s + sp + ln;
+          if (r > 255) r = 255; if (g > 255) g = 255; if (b > 255) b = 255;
+          buf[idx[i]] = ((edge[i] * 255) << 24) | (b << 16) | (g << 8) | r;
+        }
+        ctx.putImageData(out, 0, 0);
+      }
+
+      opbouwen();
+      if (fallback) fallback.remove();
+      box.appendChild(canvas);
+
+      // Bij "Beperk beweging" draait de bol extra rustig; met een klik zet je hem stil
+      if (weinigBeweging) omloop *= 1.6;
+
+      var hoek = 0, vorige = 0, frame = null, inBeeld = false, stil = false;
+      function loop(nu) {
+        hoek += ((nu - (vorige || nu)) / omloop) * Math.PI * 2;
+        vorige = nu;
+        teken(hoek);
+        frame = requestAnimationFrame(loop);
+      }
+      function bijwerken() {
+        var moet = inBeeld && !stil;
+        if (moet && !frame) { vorige = 0; frame = requestAnimationFrame(loop); }
+        if (!moet && frame) { cancelAnimationFrame(frame); frame = null; }
+      }
+      teken(0);
+      // Alleen draaien als de bol in beeld is (bespaart batterij)
+      new IntersectionObserver(function (e) { inBeeld = e[0].isIntersecting; bijwerken(); }).observe(box);
+      box.style.cursor = 'pointer';
+      box.title = 'Klik om te pauzeren of verder te draaien';
+      box.addEventListener('click', function () { stil = !stil; bijwerken(); });
+      window.addEventListener('resize', function () { opbouwen(); teken(hoek); });
+    }
+  })();
+  </script>
+</body>
+</html>
