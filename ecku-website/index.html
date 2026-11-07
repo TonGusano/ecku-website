@@ -723,7 +723,7 @@
     }
     .nieuws-body { padding: 26px; }
     .nieuws-date { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
-    .nieuws-body h3 { font-size: 18px; margin-bottom: 8px; }
+    .nieuws-body h3 { font-size: 18px; margin-bottom: 8px; color: var(--g-dark); }
     .nieuws-body p  { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
     .nieuws-link {
       font-size: 14px; font-weight: 700; color: var(--g-mid);
@@ -731,6 +731,14 @@
     }
     .nieuws-link::after { content: ' →'; }
     .nieuws-link:hover { color: var(--g-dark); }
+    /* Uitklapbaar nieuwsbericht ("Lees meer" toont de volledige tekst in de kaart) */
+    .nieuws-meer summary { list-style: none; cursor: pointer; }
+    .nieuws-meer summary::-webkit-details-marker { display: none; }
+    .nieuws-meer summary::before { content: 'Lees meer'; }
+    .nieuws-meer[open] summary::before { content: 'Minder tonen'; }
+    .nieuws-body:has(.nieuws-meer[open]) > p { display: none; }
+    .nieuws-meer-tekst { margin-top: 16px; }
+    .nieuws-meer-tekst p { margin: 0 0 12px; }
 
     /* ══════════════════════════════════════════════════════
        NIEUWSBRIEF
@@ -2093,6 +2101,26 @@
       <p class="lead" style="color:rgba(255,255,255,.8);">Blijf op de hoogte van wat ECKU doet in De Kwakel en Uithoorn.</p>
     </div>
     <div class="nieuws-grid">
+
+      <div class="nieuws-card reveal">
+        <div class="nieuws-img">
+          <img src="images/Klimaatplein-Zijdelwaard.jpg" alt="Goed bemande ECKU-stand op het Klimaatplein in winkelcentrum Zijdelwaard, met vrijwilligers die flyers uitdelen" style="width:100%;height:100%;object-fit:cover;object-position:center;border-radius:inherit;" />
+        </div>
+        <div class="nieuws-body">
+          <div class="nieuws-date">November 2026</div>
+          <h3>Klimaatplein Uithoorn: inspiratie, advies en activiteiten voor jong en oud</h3>
+          <p>Op het Klimaatplein maakten bezoekers kennis met lokale organisaties die laten zien dat duurzaamheid dichtbij huis begint. ECKU stond er met een goed bemande stand in winkelcentrum Zijdelwaard.</p>
+          <details class="nieuws-meer">
+            <summary class="nieuws-link" aria-label="Lees het volledige bericht over het Klimaatplein"></summary>
+            <div class="nieuws-meer-tekst">
+              <p>Op het Klimaatplein in Uithoorn maakten bezoekers kennis met lokale organisaties, verenigingen en deskundigen die laten zien dat duurzaamheid dichtbij huis begint. Het plein trok veel bezoekers, onder wie veel mensen die in winkelcentrum Zijdelwaard waren om boodschappen te doen en onderweg even bleven staan.</p>
+              <p>Inwoners konden er op verschillende manieren mee aan de slag. Bij een pop-up Repair Café werden kleine reparaties uitgevoerd, zodat spullen een tweede leven kregen in plaats van weggegooid te worden. Bij een initiatief van Ceres kon speelgoed worden geruild. Daarnaast was er advies over het vergroenen van de tuin, het opvangen van regenwater en de subsidies waarvoor inwoners in aanmerking kunnen komen.</p>
+              <p>Ook energiecoöperatie ECKU was aanwezig, met een goed bemande stand. Onze vrijwilligers gaven bezoekers van winkelcentrum Zijdelwaard uitleg over wat ECKU doet en over de mogelijkheden voor energiebesparing en duurzame energie in De Kwakel en Uithoorn. Er werden flyers uitgedeeld, en veel bezoekers stelden vragen over hun eigen situatie, zoals het isoleren van de woning, zonnepanelen of het verlagen van de energierekening. Voor wie meer wil weten, staat alle informatie over lid worden en onze activiteiten op deze website.</p>
+              <p>Voor kinderen waren er verschillende activiteiten, waaronder het schilderen van vogelhuisjes. Of bezoekers nu al actief bezig zijn met duurzaamheid of juist op zoek zijn naar inspiratie voor een eerste stap, op het Klimaatplein viel voor jong en oud volop te ontdekken.</p>
+            </div>
+          </details>
+        </div>
+      </div>
 
       <div class="nieuws-card reveal">
         <div class="nieuws-img">
