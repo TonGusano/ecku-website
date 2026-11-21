@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nieuws uit de energiewereld – ECKU</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <!--
+    Losse nieuws-slideshow van ECKU.
+    Wordt ingeladen op de eigen site (index.html, sectie Actueel) én in WordPress (www.ecku.nl).
+    Nieuws bijwerken = alleen dit bestand aanpassen.
+    Een bericht toevoegen: kopieer één <article class="es-slide"> blok en pas de tekst aan.
+    De bolletjes onderaan worden automatisch gemaakt.
+  -->
+  <style>
+    :root {
+      --g-dark:  #0c3d22;
+      --g-mid:   #1a6b3a;
+      --yellow:  #e8f045;
+      --radius:  16px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: transparent; }
+    body { font-family: 'Inter', Arial, sans-serif; line-height: 1.65; color: #fff; padding: 2px; }
+    a { text-decoration: none; }
+
+    .es-wrap { background: var(--g-dark); border-radius: 22px; padding: 32px 36px 26px; border: 1px solid rgba(232,240,69,.25); }
+    .es-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 22px; }
+    .es-kicker { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--yellow); margin-bottom: 6px; }
+    .es-title { font-size: 24px; line-height: 1.2; color: #fff; }
+    .es-datum { font-size: 12px; color: rgba(255,255,255,.6); margin-top: 4px; }
+    .es-controls { display: flex; gap: 8px; flex-shrink: 0; }
+    .es-btn { width: 42px; height: 42px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); background: transparent; color: #fff; font-size: 20px; line-height: 1; cursor: pointer; transition: background .18s, border-color .18s, color .18s; }
+    .es-btn[data-es="pause"] { display: inline-flex; align-items: center; justify-content: center; }
+    .es-btn svg { width: 14px; height: 14px; fill: currentColor; }
+    .es-btn:hover, .es-btn:focus-visible { background: var(--yellow); border-color: var(--yellow); color: var(--g-dark); outline: none; }
+
+    /* Alle slides in dezelfde rastercel: hoogte = langste bericht, dus niets springt */
+    .es-track { display: grid; }
+    .es-slide { grid-area: 1 / 1; opacity: 0; visibility: hidden; transform: translateX(24px); transition: opacity .6s ease, transform .6s ease, visibility .6s; background: linear-gradient(135deg, var(--g-mid) 0%, #145a30 100%); border-radius: var(--radius); padding: 30px 32px; border-left: 6px solid var(--yellow); }
+    .es-slide.is-active { opacity: 1; visibility: visible; transform: none; }
+    .es-meta { font-size: 13px; color: rgba(255,255,255,.75); margin-bottom: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    .es-tag { background: var(--yellow); color: var(--g-dark); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; border-radius: 100px; padding: 4px 12px; }
+    .es-slide h4 { font-size: clamp(20px, 2.6vw, 28px); font-weight: 800; color: #fff; margin-bottom: 12px; line-height: 1.2; }
+    .es-slide p { font-size: 16px; color: rgba(255,255,255,.88); max-width: 760px; margin-bottom: 20px; }
+    .es-link { display: inline-block; font-weight: 700; font-size: 15px; color: var(--g-dark); background: var(--yellow); border-radius: 50px; padding: 10px 22px; transition: transform .18s, box-shadow .18s; }
+    .es-link:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+
+    .es-foot { display: flex; align-items: center; gap: 20px; margin-top: 20px; }
+    .es-dots { display: flex; gap: 8px; flex-wrap: wrap; }
+    .es-dot { width: 10px; height: 10px; border-radius: 50%; border: 0; padding: 0; background: rgba(255,255,255,.3); cursor: pointer; transition: background .2s, width .2s; }
+    .es-dot[aria-selected="true"] { background: var(--yellow); width: 26px; border-radius: 10px; }
+    .es-progress { flex: 1; height: 3px; background: rgba(255,255,255,.15); border-radius: 3px; overflow: hidden; }
+    .es-progress i { display: block; height: 100%; width: 0; background: var(--yellow); }
+
+    @media (max-width: 640px) {
+      .es-wrap { padding: 24px 18px 20px; border-radius: 18px; }
+      .es-head { flex-direction: column; align-items: flex-start; }
+      .es-title { font-size: 20px; }
+      .es-slide { padding: 22px 20px; }
+      .es-slide p { font-size: 15px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .es-slide { transition: opacity .2s; transform: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="es-wrap" id="energie-slider" aria-roledescription="carrousel" aria-label="Nieuws uit de energiewereld">
+    <div class="es-head">
+      <div>
+        <div class="es-kicker">Nieuws uit de energiewereld</div>
+        <h3 class="es-title">Wat speelt er in Nederland?</h3>
+        <div class="es-datum">Bijgewerkt op 21 november 2026</div>
+      </div>
+      <div class="es-controls">
+        <button type="button" class="es-btn" data-es="prev" aria-label="Vorig bericht">&#8249;</button>
+        <button type="button" class="es-btn" data-es="pause" aria-label="Pauzeren"></button>
+        <button type="button" class="es-btn" data-es="next" aria-label="Volgend bericht">&#8250;</button>
+      </div>
+    </div>
+
+    <div class="es-track" aria-live="polite">
+
+      <article class="es-slide">
+        <div class="es-meta"><b class="es-tag">Netcongestie</b> Energie Samen · 20 november 2026</div>
+        <h4>Stroomnet vaak minder vol dan gedacht</h4>
+        <p>In 40 tot 60 procent van de onderzochte gebieden met netcongestie blijkt er toch ruimte op het stroomnet, als netbeheerders rekenen met actuelere verwachtingen. Dat kan 900 tot 1.100 megawatt extra ruimte opleveren, ook voor lokale energieprojecten die nu vastlopen.</p>
+        <a class="es-link" href="https://energiesamen.nu/nieuws/stroomnet-blijkt-in-40-tot-60-procent-van-onderzochte-gebieden-minder-vol-dan-gedacht/" target="_blank" rel="noopener">Lees verder bij Energie Samen &rarr;</a>
+      </article>
+
+      <article class="es-slide">
+        <div class="es-meta"><b class="es-tag">In de regio</b> Energie Samen Noord-Holland · 19 november 2026</div>
+        <h4>Noord-Holland zet in op warmte en energie delen</h4>
+        <p>Op de ledenvergadering van Energie Samen Noord-Holland stond de koers voor 2027 centraal. Het werk draait om drie thema's: warmte, energie delen, en eerlijke energie en besparen. Doel: minstens de helft van de energieprojecten in lokale handen.</p>
+        <a class="es-link" href="https://energiesamennoordholland.nl/verslag-alv-en-sessie-energiedelen/" target="_blank" rel="noopener">Lees verder bij ESNH &rarr;</a>
+      </article>
+
+      <article class="es-slide">
+        <div class="es-meta"><b class="es-tag">Slim stroomgebruik</b> TNO / Energy.nl · 18 november 2026</div>
+        <h4>Warmtepomp, thuisbatterij en laadpaal leren samenwerken</h4>
+        <p>Het stroomnet in de wijk raakt vaker vol. Slimme apparaten kunnen helpen door hun verbruik af te stemmen op wat het net aankan. Europa maakt nu afspraken zodat al die apparaten met elkaar en met het net kunnen 'praten'.</p>
+        <a class="es-link" href="https://energy.nl/publications/flexibel-stroomgebruik-europese-ontwikkelingen/" target="_blank" rel="noopener">Lees verder bij Energy.nl &rarr;</a>
+      </article>
+
+      <article class="es-slide">
+        <div class="es-meta"><b class="es-tag">Wind op zee</b> TNO · 17 november 2026</div>
+        <h4>Eneco deelt tien jaar gegevens van windpark op zee</h4>
+        <p>Eneco maakt de productie- en windgegevens van het Prinses Amaliawindpark openbaar via een platform van TNO. Zo kunnen onderzoekers en bedrijven windparken op zee beter begrijpen en verbeteren.</p>
+        <a class="es-link" href="https://www.tno.nl/nl/newsroom/2026/11/eneco-deelt-gegevens-windpark-zee/" target="_blank" rel="noopener">Lees verder bij TNO &rarr;</a>
+      </article>
+
+      <article class="es-slide">
+        <div class="es-meta"><b class="es-tag">Coöperaties</b> Energie Samen · 16 november 2026</div>
+        <h4>Vanaf 2027 mogen coöperaties zelf zonnestroom gebruiken</h4>
+        <p>Omdat de salderingsregeling per 2027 stopt, mogen zonneprojecten met postcoderoos-subsidie (SCE) een deel van hun stroom zelf verbruiken, bijvoorbeeld voor verlichting. Dat geldt voor nieuwe én bestaande installaties.</p>
+        <a class="es-link" href="https://energiesamen.nu/nieuws/wat-betekent-eigen-verbruik-in-de-sce-vanaf-2027/" target="_blank" rel="noopener">Lees verder bij Energie Samen &rarr;</a>
+      </article>
+
+      <article class="es-slide">
+        <div class="es-meta"><b class="es-tag">Besparen</b> Energie Samen · 13 november 2026</div>
+        <h4>Bespaarweken: hulp aan huis en warmtebeelden</h4>
+        <p>De landelijke Bespaarweken van ANWB EnergieMaatje zijn begonnen. Vrijwilligers helpen bewoners thuis met besparen en laten met warmtebeelden zien waar een huis warmte verliest.</p>
+        <a class="es-link" href="https://energiesamen.nu/nieuws/van-warmtebeelden-tot-hulp-aan-huis-bespaarweken-van-anwb-energiemaatje-volop-in-beweging/" target="_blank" rel="noopener">Lees verder bij Energie Samen &rarr;</a>
+      </article>
+
+      <article class="es-slide">
+        <div class="es-meta"><b class="es-tag">Netcongestie</b> TNO · 13 november 2026</div>
+        <h4>Volle stroomnet remt elektrische vrachtwagens af</h4>
+        <p>Zonder netcongestie zou in 2040 zo'n driekwart van de Nederlandse vrachtwagens elektrisch kunnen rijden. Met de huidige stroomcontracten blijft dat steken op ongeveer 20 procent, blijkt uit onderzoek van TNO voor het PBL.</p>
+        <a class="es-link" href="https://www.tno.nl/nl/newsroom/insights/2026/11/ontcijferd-netcongestie-vrachtwagens/" target="_blank" rel="noopener">Lees verder bij TNO &rarr;</a>
+      </article>
+
+      <article class="es-slide">
+        <div class="es-meta"><b class="es-tag">Energie delen</b> Energie Samen · 10 november 2026</div>
+        <h4>Kamerlid positief over energie delen</h4>
+        <p>Tweede Kamerlid Sjoukje van Oosterhout bezocht Energie Samen Rivierenland en zag hoe energie delen in de praktijk werkt. Mede door haar motie wordt nu gewerkt aan een landelijk programma voor energiegemeenschappen.</p>
+        <a class="es-link" href="https://energiesamen.nu/nieuws/sjoukje-van-oosterhout-pro-positief-over-energiedelen-en-de-kracht-van-een-lokaal-energiesysteem/" target="_blank" rel="noopener">Lees verder bij Energie Samen &rarr;</a>
+      </article>
+
+      <article class="es-slide">
+        <div class="es-meta"><b class="es-tag">Coöperaties</b> HIER · Lokale Energie Monitor 2025</div>
+        <h4>Bijna 700 energiecoöperaties met ruim 143.000 leden</h4>
+        <p>Er zijn 696 energiecoöperaties in Nederland, met samen 143.211 leden en meer dan 9.000 vrijwilligers. Warmteprojecten groeien hard, maar er komen minder nieuwe zonne- en windprojecten bij.</p>
+        <a class="es-link" href="https://www.hier.nu/lokale-energie-monitor-2025" target="_blank" rel="noopener">Lees verder bij HIER &rarr;</a>
+      </article>
+
+    </div>
+
+    <div class="es-foot">
+      <div class="es-dots" role="tablist" aria-label="Kies een bericht"></div>
+      <div class="es-progress"><i></i></div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var root = document.getElementById('energie-slider');
+    var slides = root.querySelectorAll('.es-slide');
+    var dotsBox = root.querySelector('.es-dots');
+    var bar = root.querySelector('.es-progress i');
+    var pauseBtn = root.querySelector('[data-es="pause"]');
+    var DUUR = 8000; // milliseconden per bericht
+    var huidig = 0, timer = null, start = 0, resterend = DUUR;
+    var gepauzeerd = false, hover = false;
+    var weinigBeweging = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    slides.forEach(function (s, i) {
+      var d = document.createElement('button');
+      d.type = 'button';
+      d.className = 'es-dot';
+      d.setAttribute('role', 'tab');
+      d.setAttribute('aria-label', 'Bericht ' + (i + 1));
+      d.addEventListener('click', function () { toon(i, true); });
+      dotsBox.appendChild(d);
+    });
+    var dots = dotsBox.querySelectorAll('.es-dot');
+
+    function toon(i, handmatig) {
+      if (handmatig) stop();
+      huidig = (i + slides.length) % slides.length;
+      slides.forEach(function (s, n) {
+        s.classList.toggle('is-active', n === huidig);
+        s.setAttribute('aria-hidden', n === huidig ? 'false' : 'true');
+        s.querySelectorAll('a').forEach(function (a) { a.tabIndex = n === huidig ? 0 : -1; });
+      });
+      dots.forEach(function (d, n) { d.setAttribute('aria-selected', n === huidig ? 'true' : 'false'); });
+      resterend = DUUR;
+      bar.style.transition = 'none';
+      bar.style.width = '0';
+      if (handmatig) speel();
+    }
+
+    function loopt() { return !gepauzeerd && !hover; }
+
+    function speel() {
+      if (!loopt()) return;
+      start = Date.now();
+      bar.style.transition = 'none';
+      bar.style.width = ((DUUR - resterend) / DUUR * 100) + '%';
+      void bar.offsetWidth;
+      if (!weinigBeweging) {
+        bar.style.transition = 'width ' + resterend + 'ms linear';
+        bar.style.width = '100%';
+      }
+      timer = setTimeout(function () { resterend = DUUR; toon(huidig + 1); speel(); }, resterend);
+    }
+
+    function stop() {
+      if (timer) {
+        clearTimeout(timer); timer = null;
+        resterend = Math.max(0, resterend - (Date.now() - start));
+      }
+      var w = getComputedStyle(bar).width;
+      bar.style.transition = 'none';
+      bar.style.width = w;
+    }
+
+    root.querySelector('[data-es="prev"]').addEventListener('click', function () { toon(huidig - 1, true); });
+    root.querySelector('[data-es="next"]').addEventListener('click', function () { toon(huidig + 1, true); });
+    var ICOON_PAUZE = '<svg viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1" width="3.5" height="12" rx="1"/><rect x="8.5" y="1" width="3.5" height="12" rx="1"/></svg>';
+    var ICOON_SPEEL = '<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5v11l9.5-5.5z"/></svg>';
+    pauseBtn.innerHTML = ICOON_PAUZE;
+    pauseBtn.addEventListener('click', function () {
+      gepauzeerd = !gepauzeerd;
+      pauseBtn.innerHTML = gepauzeerd ? ICOON_SPEEL : ICOON_PAUZE;
+      pauseBtn.setAttribute('aria-label', gepauzeerd ? 'Afspelen' : 'Pauzeren');
+      gepauzeerd ? stop() : speel();
+    });
+
+    // Pauzeren zolang de muis erop staat of iemand met het toetsenbord in de slider zit
+    root.addEventListener('mouseenter', function () { hover = true; stop(); });
+    root.addEventListener('mouseleave', function () { hover = false; speel(); });
+    root.addEventListener('focusin', function (e) { if (e.target.matches(':focus-visible')) { hover = true; stop(); } });
+    root.addEventListener('focusout', function (e) { if (!root.contains(e.relatedTarget)) { hover = false; speel(); } });
+
+    // Vegen op telefoon
+    var x0 = null;
+    root.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    root.addEventListener('touchend', function (e) {
+      if (x0 === null) return;
+      var dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 40) toon(huidig + (dx < 0 ? 1 : -1), true);
+      x0 = null;
+    });
+
+    toon(0, true);
+
+    // Hoogte doorgeven aan de pagina waarin deze slideshow is ingebouwd (iframe)
+    function meldHoogte() {
+      if (window.parent !== window) {
+        window.parent.postMessage({ eckuSlider: true, hoogte: Math.ceil(document.documentElement.scrollHeight) }, '*');
+      }
+    }
+    if (window.ResizeObserver) new ResizeObserver(meldHoogte).observe(document.body);
+    window.addEventListener('load', meldHoogte);
+    meldHoogte();
+  })();
+  </script>
+</body>
+</html>
