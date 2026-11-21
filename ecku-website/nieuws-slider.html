@@ -250,10 +250,11 @@
     // Hoogte doorgeven aan de pagina waarin deze slideshow is ingebouwd (iframe)
     function meldHoogte() {
       if (window.parent !== window) {
-        window.parent.postMessage({ eckuSlider: true, hoogte: Math.ceil(document.documentElement.scrollHeight) }, '*');
+        // Hoogte van de slideshow zelf (+ 2px rand boven en onder), niet van het venster
+        window.parent.postMessage({ eckuSlider: true, hoogte: Math.ceil(root.getBoundingClientRect().height) + 4 }, '*');
       }
     }
-    if (window.ResizeObserver) new ResizeObserver(meldHoogte).observe(document.body);
+    if (window.ResizeObserver) new ResizeObserver(meldHoogte).observe(root);
     window.addEventListener('load', meldHoogte);
     meldHoogte();
   })();
