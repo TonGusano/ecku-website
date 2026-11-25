@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ECKU – Energie Coöperatie De Kwakel & Uithoorn</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -179,6 +180,20 @@
       }
       .header-desktop { display: none; }
       .header-mobiel { display: block; }
+      /* Mobiele header: live tekst + draaiende bol (past zich aan elke telefoonbreedte aan) */
+      .header-banner .header-mobiel-blok {
+        display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+        gap: 8px; padding: 12px 12px; line-height: 1.1;
+        font-family: 'Roboto Condensed', 'Arial Narrow', sans-serif;
+      }
+      .hm-tekst { color: #b5c68f; text-shadow: 2px 2px 3px rgba(0,0,0,.35); }
+      .hm-tekst b { display: block; font-size: clamp(30px, 10vw, 52px); font-weight: 700; line-height: .95; letter-spacing: .5px; }
+      .hm-tekst span { display: block; font-size: clamp(12px, 3.6vw, 18px); font-weight: 400; margin-top: 3px; }
+      .hm-links { text-align: left; }
+      .hm-rechts { text-align: right; }
+      .ecku-globe.header-globe-mobiel { --globe-size: clamp(76px, 24vw, 120px); width: var(--globe-size); }
+      .ecku-globe.header-globe-mobiel::before { display: none; }
+      .hero-globe-mobiel { display: none !important; }
     }
 
 
@@ -942,9 +957,13 @@
         <img src="images/logo-ecku-rond.webp" alt="" />
       </div>
       <!-- Mobiele header (verborgen op desktop) -->
-      <img src="images/MobielHeaderECKU.png"
-           alt="ECKU – Energiecoöperatie Uithoorn & De Kwakel"
-           class="header-banner-img header-mobiel" />
+      <div class="header-mobiel header-mobiel-blok" role="img" aria-label="ECKU – Energiecoöperatie Uithoorn & De Kwakel">
+        <div class="hm-tekst hm-links"><b>ECKU</b><span>voor en door inwoners</span></div>
+        <div class="ecku-globe header-globe-mobiel" data-src="images/logo-ecku-rond.webp" data-seconds="24">
+          <img src="images/logo-ecku-rond.webp" alt="" />
+        </div>
+        <div class="hm-tekst hm-rechts"><b>SAMEN</b><span>op weg naar een duurzame toekomst</span></div>
+      </div>
     </a>
   </div>
 
@@ -999,10 +1018,6 @@
 
       <!-- Text -->
       <div class="hero-content">
-        <!-- Draaiend ECKU-logo, alleen op telefoon (de foto rechts is daar verborgen) -->
-        <div class="ecku-globe hero-globe-mobiel" data-src="images/logo-ecku-rond.webp" data-seconds="24">
-          <img src="images/logo-ecku-rond.webp" alt="Logo ECKU, Energiecoöperatie De Kwakel Uithoorn" />
-        </div>
         <div class="hero-badge">⚡ Opgericht december 2025 · De Kwakel &amp; Uithoorn</div>
         <h1>Samen <em>duurzame energie</em> opwekken in onze regio</h1>
         <div class="hero-btns">
