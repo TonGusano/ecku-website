@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ECKU – Energie Coöperatie De Kwakel & Uithoorn</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -153,7 +152,7 @@
     }
 
     /* Draaiend wereldbol-logo midden in de desktop-header (positie in % van de header) */
-    #site-header { --header-bg: linear-gradient(90deg, #06271a 0%, #103620 25%, #1c4524 50%, #275529 75%, #316a29 100%); /* ← headerkleur (loopt mee met de afbeelding): pas alleen deze regel aan */ }
+    #site-header { --header-bg: linear-gradient(90deg, #023f1d 0%, #084621 10%, #0e4d28 20%, #13542c 30%, #1b5930 40%, #1d6034 50%, #266638 60%, #2a6d3a 70%, #2e723f 80%, #327741 90%, #3a7f48 100%); /* ← headerkleur (loopt mee met de afbeelding): pas alleen deze regel aan */ }
     .header-banner { position: relative; }
     .ecku-globe.header-globe {
       /* ← positie/formaat: left/top = midden van de bol in %, width = diameter in % van headerbreedte */
@@ -165,11 +164,12 @@
 
     /* Nav bar: zelfde kleur als header-bg, geen lijnen */
     .nav-bar {
-      background: var(--header-bg, #1c4524);
+      background: var(--header-bg, #1d6034);
     }
 
     /* Desktop: toon desktop header, verberg mobiel */
     .header-mobiel { display: none; }
+    .ecku-globe.header-globe-mobiel { display: none; }
     .header-desktop { display: block; }
 
     /* Mobiel: toon mobiele header, verberg desktop */
@@ -180,20 +180,15 @@
       }
       .header-desktop { display: none; }
       .header-mobiel { display: block; }
-      /* Mobiele header: live tekst + draaiende bol (past zich aan elke telefoonbreedte aan) */
-      .header-banner .header-mobiel-blok {
-        display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-        gap: 8px; padding: 12px 12px; line-height: 1.1;
-        font-family: 'Roboto Condensed', 'Arial Narrow', sans-serif;
+      /* Mobiel: eigen kleurverloop (gelijk aan Mobielheadernieuw.png) en bol tussen de teksten */
+      #site-header { --header-bg: linear-gradient(90deg, #013e1c 0%, #04401f 10%, #074522 20%, #0b4925 30%, #0e4c27 40%, #104e29 50%, #12522a 60%, #13562b 70%, #18572f 80%, #1a5930 90%, #1b5c32 100%); }
+      .ecku-globe.header-globe-mobiel {
+        /* midden van de bol in % van de header; --globe-size en width gelijk houden */
+        --globe-size: 27%; width: 27%; left: 46.1%; top: 50%;
+        display: block; position: absolute; transform: translate(-50%, -50%);
       }
-      .hm-tekst { color: #b5c68f; text-shadow: 2px 2px 3px rgba(0,0,0,.35); }
-      .hm-tekst b { display: block; font-size: clamp(30px, 10vw, 52px); font-weight: 700; line-height: .95; letter-spacing: .5px; }
-      .hm-tekst span { display: block; font-size: clamp(12px, 3.6vw, 18px); font-weight: 400; margin-top: 3px; }
-      .hm-links { text-align: left; }
-      .hm-rechts { text-align: right; }
-      .ecku-globe.header-globe-mobiel { --globe-size: clamp(76px, 24vw, 120px); width: var(--globe-size); }
       .ecku-globe.header-globe-mobiel::before { display: none; }
-      .hero-globe-mobiel { display: none !important; }
+      .hero { padding-top: calc(33.34vw + 68px) !important; } /* mobiele header is 3 : 1 */
     }
 
 
@@ -408,7 +403,7 @@
       min-height: 100vh;
       background: linear-gradient(140deg, var(--g-dark) 0%, #1a6b3a 55%, #2eaa5f 100%);
       display: flex; align-items: center;
-      padding-top: calc(15.3vw + 68px); /* aangepast aan nieuwe header (1440x220px) + navigatiebalk */
+      padding-top: calc(15.3vw + 68px); /* headerhoogte (2880x440) + navigatiebalk */
       position: relative; overflow: hidden;
     }
     .hero-bg-pattern {
@@ -421,7 +416,7 @@
       display: grid; grid-template-columns: 1fr 1fr;
       gap: 64px; align-items: center;
       position: relative; z-index: 1;
-      padding: 80px 0;
+      padding: 40px 0 80px;
     }
     .hero-badge {
       display: inline-flex; align-items: center; gap: 8px;
@@ -906,7 +901,7 @@
       .mobile-menu { top: 156px; }
       .podcast-cards { grid-template-columns: 1fr; }
       .section { padding: 64px 0; }
-      .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+      .hero-inner { grid-template-columns: 1fr; gap: 40px; padding: 24px 0 64px; }
       .hero-photo { display: none; }
       .energie-grid, .lid-grid, .about-grid,
       .newsletter-wrap, .contact-grid { grid-template-columns: 1fr; gap: 40px; }
@@ -950,19 +945,18 @@
   <div class="header-bg">
     <a href="#home" class="header-banner">
       <!-- Desktop header (verborgen op mobiel) -->
-      <img src="images/Nieuweheader.png"
+      <img src="images/Laptopheadernieuw.png"
            alt="ECKU – Energiecoöperatie Uithoorn & De Kwakel"
            class="header-banner-img header-desktop" />
       <div class="ecku-globe header-globe" data-src="images/logo-ecku-rond.webp" data-seconds="24">
         <img src="images/logo-ecku-rond.webp" alt="" />
       </div>
       <!-- Mobiele header (verborgen op desktop) -->
-      <div class="header-mobiel header-mobiel-blok" role="img" aria-label="ECKU – Energiecoöperatie Uithoorn & De Kwakel">
-        <div class="hm-tekst hm-links"><b>ECKU</b><span>voor en door inwoners</span></div>
-        <div class="ecku-globe header-globe-mobiel" data-src="images/logo-ecku-rond.webp" data-seconds="24">
-          <img src="images/logo-ecku-rond.webp" alt="" />
-        </div>
-        <div class="hm-tekst hm-rechts"><b>SAMEN</b><span>op weg naar een duurzame toekomst</span></div>
+      <img src="images/Mobielheadernieuw.png"
+           alt="ECKU – Energiecoöperatie Uithoorn & De Kwakel"
+           class="header-banner-img header-mobiel" />
+      <div class="ecku-globe header-globe-mobiel" data-src="images/logo-ecku-rond.webp" data-seconds="24">
+        <img src="images/logo-ecku-rond.webp" alt="" />
       </div>
     </a>
   </div>
